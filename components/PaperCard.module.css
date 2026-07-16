@@ -1,0 +1,375 @@
+.paperCardComponent {
+  /* camada branca de trás */
+  --back-tear-size: 46px;
+  --back-tear-offset: -15px;
+  --back-tear-inset: -8px;
+
+  --back-side-width: 58px;
+  --back-side-offset: -16px;
+
+  --corner-clearance: 32px;
+  --side-overlap: 8px;
+
+  /*
+    ajustes separados das laterais brancas:
+    esquerda cresce só para baixo;
+    direita cresce para cima e para baixo.
+  */
+  --back-left-bottom-extra: 20px;
+  --back-right-top-extra: 8px;
+  --back-right-bottom-extra: 20px;
+
+  --back-top-right-trim: 10px;
+  --back-bottom-left-trim: 10px;
+
+  /*
+    corpo principal central
+    mais aberto em cima e embaixo
+  */
+  --main-core-top: 20px;
+  --main-core-right: 22px;
+  --main-core-bottom: 20px;
+  --main-core-left: 22px;
+
+  /*
+    rasgos principais
+    topo/base mais largos
+    laterais ajustadas
+  */
+  --main-tear-size: 28px;
+  --main-tear-offset: 2px;
+  --main-tear-inset: 12px;
+
+  --main-side-width: 38px;
+  --main-side-offset: 2px;
+  --main-corner-clearance: 42px;
+  --main-side-overlap: 26px;
+
+  position: relative;
+  width: 100%;
+  isolation: isolate;
+  transition:
+    transform 220ms ease,
+    filter 220ms ease;
+}
+
+.paperCardComponent:hover {
+  transform: translateY(-4px) rotate(-0.12deg);
+}
+
+/* camada branca atrás */
+.paperBackLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* card container */
+.paperCardSurface {
+  position: relative;
+  z-index: 2;
+  overflow: visible;
+  min-height: 100%;
+}
+
+/* camada principal visual */
+.paperMainLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* =========================
+   CORPO CENTRAL PRINCIPAL
+   ========================= */
+
+.paperMainCore {
+  position: absolute;
+  top: var(--main-core-top);
+  right: var(--main-core-right);
+  bottom: var(--main-core-bottom);
+  left: var(--main-core-left);
+
+  z-index: 1;
+  overflow: hidden;
+  background-color: var(--paper);
+  box-shadow:
+    0 14px 24px rgba(52, 31, 21, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.36);
+}
+
+.paperMainCore::before {
+  content: "";
+  position: absolute;
+  inset: -96px;
+  pointer-events: none;
+
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  opacity: 0.78;
+  mix-blend-mode: multiply;
+}
+
+.paperMainCore::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background:
+    radial-gradient(rgba(52, 31, 21, 0.04) 0.7px, transparent 1px),
+    radial-gradient(rgba(255, 255, 255, 0.12) 0.8px, transparent 1px);
+  background-size:
+    7px 7px,
+    5px 5px;
+  background-position:
+    0 0,
+    2px 3px;
+
+  opacity: 0.12;
+  mix-blend-mode: multiply;
+}
+
+
+/* conteúdo acima de tudo */
+.paperCardContent {
+  position: relative;
+  z-index: 30;
+}
+
+/* =========================
+   BACK WHITE TORN LAYER
+   ========================= */
+
+.paperTornEdge {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* topo branco */
+.paperTornTop {
+  left: var(--back-tear-inset);
+  right: calc(var(--back-tear-inset) + var(--back-top-right-trim));
+  top: var(--back-tear-offset);
+  height: var(--back-tear-size);
+
+  background-image: var(--paper-mask-top);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* base branca */
+.paperTornBottom {
+  left: calc(var(--back-tear-inset) + var(--back-bottom-left-trim));
+  right: var(--back-tear-inset);
+  bottom: var(--back-tear-offset);
+  height: var(--back-tear-size);
+
+  background-image: var(--paper-mask-bottom);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  transform: scaleY(-1);
+}
+
+/* lateral esquerda branca */
+.paperTornLeft {
+  left: var(--back-side-offset);
+  top: calc(var(--corner-clearance) - var(--side-overlap));
+  width: var(--back-side-width);
+  height: calc(
+    100% - (var(--corner-clearance) * 2) + (var(--side-overlap) * 2) + var(--back-left-bottom-extra)
+  );
+  overflow: hidden;
+}
+
+.paperTornLeft::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  width: calc(
+    var(--paper-card-height, 700px) - (var(--corner-clearance) * 2) + (var(--side-overlap) * 2) + var(--back-left-bottom-extra)
+  );
+  height: var(--back-side-width);
+
+  background-image: var(--paper-mask-left);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  transform: translate(-50%, -50%) rotate(-90deg);
+  transform-origin: center;
+}
+
+/* lateral direita branca */
+.paperTornRight {
+  right: var(--back-side-offset);
+  top: calc(var(--corner-clearance) - var(--side-overlap) - var(--back-right-top-extra));
+  width: var(--back-side-width);
+  height: calc(
+    100% - (var(--corner-clearance) * 2) + (var(--side-overlap) * 2) + var(--back-right-top-extra) + var(--back-right-bottom-extra)
+  );
+  overflow: hidden;
+}
+
+.paperTornRight::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  width: calc(
+    var(--paper-card-height, 700px) - (var(--corner-clearance) * 2) + (var(--side-overlap) * 2) + var(--back-right-top-extra) + var(--back-right-bottom-extra)
+  );
+  height: var(--back-side-width);
+
+  background-image: var(--paper-mask-right);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  transform: translate(-50%, -50%) rotate(90deg);
+  transform-origin: center;
+}
+
+/* =========================
+   MAIN MASKED TORN LAYER
+   quadrado central + rasgos com textura
+   ========================= */
+
+.mainTornEdge {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* fill igual ao papel principal */
+.mainTornTop,
+.mainTornBottom,
+.mainTornLeft::before,
+.mainTornRight::before {
+  background-color: var(--paper);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 760px 760px;
+  background-blend-mode: multiply;
+}
+
+/* topo rasgado */
+.mainTornTop {
+  left: var(--main-tear-inset);
+  right: var(--main-tear-inset);
+  top: var(--main-tear-offset);
+  height: var(--main-tear-size);
+
+  mask-image: var(--paper-mask-top);
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  mask-position: center;
+
+  -webkit-mask-image: var(--paper-mask-top);
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+/* base rasgada */
+.mainTornBottom {
+  left: var(--main-tear-inset);
+  right: var(--main-tear-inset);
+  bottom: var(--main-tear-offset);
+  height: var(--main-tear-size);
+
+  transform: scaleY(-1);
+
+  mask-image: var(--paper-mask-bottom);
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  mask-position: center;
+
+  -webkit-mask-image: var(--paper-mask-bottom);
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+/* lateral esquerda rasgada */
+.mainTornLeft {
+  left: var(--main-side-offset);
+  top: calc(var(--main-corner-clearance) - var(--main-side-overlap));
+  width: var(--main-side-width);
+  height: calc(
+    100% - (var(--main-corner-clearance) * 2) + (var(--main-side-overlap) * 2)
+  );
+  overflow: hidden;
+}
+
+.mainTornLeft::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  width: calc(
+    var(--paper-card-height, 700px) - (var(--main-corner-clearance) * 2) + (var(--main-side-overlap) * 2)
+  );
+  height: var(--main-side-width);
+
+  transform: translate(-50%, -50%) rotate(-90deg);
+  transform-origin: center;
+
+  mask-image: var(--paper-mask-left);
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  mask-position: center;
+
+  -webkit-mask-image: var(--paper-mask-left);
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+/* lateral direita rasgada */
+.mainTornRight {
+  right: var(--main-side-offset);
+  top: calc(var(--main-corner-clearance) - var(--main-side-overlap));
+  width: var(--main-side-width);
+  height: calc(
+    100% - (var(--main-corner-clearance) * 2) + (var(--main-side-overlap) * 2)
+  );
+  overflow: hidden;
+}
+
+.mainTornRight::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  width: calc(
+    var(--paper-card-height, 700px) - (var(--main-corner-clearance) * 2) + (var(--main-side-overlap) * 2)
+  );
+  height: var(--main-side-width);
+
+  transform: translate(-50%, -50%) rotate(90deg);
+  transform-origin: center;
+
+  mask-image: var(--paper-mask-right);
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  mask-position: center;
+
+  -webkit-mask-image: var(--paper-mask-right);
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}

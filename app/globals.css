@@ -1,26 +1,4629 @@
+@import url("https://fonts.googleapis.com/css2?family=Rubik+Dirt&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #f6ead6;
+  --paper: #f1dfbf;
+  --paper-light: #f8edda;
+  --ink: #341f15;
+  --ink-soft: rgba(52, 31, 21, 0.72);
+  --ink-faint: rgba(52, 31, 21, 0.42);
+  --red: #ab322b;
+  --red-dark: #8f281f;
+  --mustard: #d89a1b;
+  --teal: #2f98a3;
+  --sage: #76844d;
+  --terra: #c37a45;
+  --brown: #98603b;
+  --shadow-soft: 0 12px 28px rgba(52, 31, 21, 0.08);
+  --shadow-card: 0 16px 34px rgba(52, 31, 21, 0.12);
+  --shadow-hover: 0 22px 44px rgba(52, 31, 21, 0.16);
+  --font-body:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-display:
+    "Arial Black", Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@property --ray-angle {
+  syntax: "<angle>";
+  initial-value: -12deg;
+  inherits: false;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  background: var(--bg);
+  font-family: var(--font-body);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-shell {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--bg);
+}
+
+.site-shell::before {
+  content: "";
+  position: fixed;
+  inset: -48vmax;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    repeating-conic-gradient(
+      from var(--ray-angle) at -10% 108%,
+      #d8b65d 0deg 7deg,
+      #fff8ef 7deg 10deg,
+      #9ed6da 10deg 18deg,
+      #fff8ef 18deg 21deg,
+      #c9824d 21deg 29deg,
+      #fff8ef 29deg 32deg,
+      #d9554e 32deg 40deg,
+      #fff8ef 40deg 43deg,
+      #d8cf8c 43deg 51deg,
+      #fff8ef 51deg 54deg,
+      #7fc7cf 54deg 62deg,
+      #fff8ef 62deg 65deg,
+      #b36f41 65deg 73deg,
+      #fff8ef 73deg 76deg
+    );
+  opacity: 0.72;
+  filter: saturate(0.9) contrast(0.98);
+  animation: rayAngleDrift 1020s linear infinite;
+}
+
+.site-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 900px 900px;
+  background-repeat: repeat;
+  opacity: 0.12;
+  mix-blend-mode: multiply;
+}
+
+.site-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+.section-shell {
+  width: min(1280px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.section-block {
+  padding-block: 2.1rem 0.5rem;
+}
+
+.card-grid {
+  display: grid;
+  gap: 1.4rem;
+  margin-top: 1.6rem;
+}
+
+.card-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.card-grid-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.section-header-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.divider-line {
+  padding-top: 2.2rem;
+}
+
+.divider-line span {
+  display: block;
+  height: 1px;
+  width: 100%;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(52, 31, 21, 0.12) 12%,
+      rgba(52, 31, 21, 0.2) 50%,
+      rgba(52, 31, 21, 0.12) 88%,
+      transparent 100%
+    );
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.75s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.75s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.reveal.visible,
+.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* HEADER */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 0.85rem 1rem 0.35rem;
+  pointer-events: none;
+}
+
+.site-nav {
+  width: min(1180px, calc(100% - 1rem));
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.72rem 0.85rem;
+  border: 1px solid rgba(52, 31, 21, 0.16);
+  border-radius: 999px;
+  background-color: rgba(246, 234, 214, 0.78);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 620px 620px;
+  background-blend-mode: multiply;
+  box-shadow:
+    0 12px 28px rgba(52, 31, 21, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.48);
+  backdrop-filter: blur(14px);
+  pointer-events: auto;
+}
+
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 1.1rem;
+  padding-right: 0.25rem;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.brand-lockup:hover {
+  transform: translateY(-2px) rotate(-1deg);
+  filter: brightness(1.04);
+}
+
+.brand-logo {
+  display: block;
+  height: 3.4rem;
+  width: auto;
+  object-fit: contain;
+  filter:
+    contrast(1.7)
+    saturate(1.2)
+    drop-shadow(0 2px 2px rgba(52, 31, 21, 0.35))
+    drop-shadow(0 8px 10px rgba(52, 31, 21, 0.2));
+}
+
+.site-nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.35rem;
+}
+
+.nav-link {
+  position: relative;
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(52, 31, 21, 0.72);
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--ink);
+  transform: translateY(-2px);
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.42rem;
+  width: 100%;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--red);
+  transform: translateX(-50%) scaleX(0);
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+.nav-link:hover::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+.nav-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0.7rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(143, 40, 31, 0.3);
+  background-color: var(--red);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 360px 360px;
+  background-blend-mode: multiply;
+  color: #fffaf4;
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  box-shadow:
+    0 10px 16px rgba(52, 31, 21, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.nav-button:hover {
+  transform: translateY(-2px) rotate(0.5deg);
+  box-shadow:
+    0 14px 20px rgba(52, 31, 21, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  filter: saturate(1.08);
+}
+
+/* CARDS / BUTTONS / CHIPS */
+
+.standard-paper-card {
+  min-height: 100%;
+}
+
+.standard-paper-card-inner {
+  min-height: 100%;
+  padding: 1.5rem;
+}
+
+.standard-paper-card,
+.hero-main-card,
+.contact-card {
+  filter: drop-shadow(0 18px 26px rgba(52, 31, 21, 0.18));
+  transition: transform 0.22s ease;
+}
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 46px;
+  padding: 0.88rem 1.15rem;
+  border-radius: 999px;
+  border: 1px solid rgba(52, 31, 21, 0.13);
+  background-color: var(--paper-light);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 520px 520px;
+  background-blend-mode: multiply;
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow:
+    0 12px 18px rgba(52, 31, 21, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.56);
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    filter 0.22s ease;
+  cursor: pointer;
+}
+
+.action-button:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 18px 24px rgba(52, 31, 21, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  filter: saturate(1.05);
+}
+
+.action-button-primary {
+  border-color: rgba(143, 40, 31, 0.24);
+  background-color: var(--red);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 420px 420px;
+  background-blend-mode: multiply;
+  color: #fffaf4;
+}
+
+.action-button-teal {
+  border-color: rgba(47, 152, 163, 0.26);
+  background-color: var(--teal);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 420px 420px;
+  background-blend-mode: multiply;
+  color: #fffaf4;
+}
+
+.action-button-ghost {
+  background-color: var(--paper-light);
+}
+
+.info-chip {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  gap: 0.42rem;
+  padding: 0.52rem 0.76rem;
+  border: 1px solid rgba(52, 31, 21, 0.12);
+  font-size: 0.66rem;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: #fffaf4;
+  transform: rotate(-1deg);
+  box-shadow: 0 8px 12px rgba(52, 31, 21, 0.1);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 320px 320px;
+  background-blend-mode: multiply;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.info-chip:hover {
+  transform: translateY(-2px) rotate(-1deg);
+  box-shadow: 0 12px 16px rgba(52, 31, 21, 0.14);
+  filter: saturate(1.06);
+}
+
+.chip-red {
+  background-color: var(--red);
+}
+
+.chip-teal {
+  background-color: var(--teal);
+}
+
+.chip-mustard {
+  background-color: var(--mustard);
+}
+
+.chip-sage {
+  background-color: var(--sage);
+}
+
+.chip-terra {
+  background-color: var(--terra);
+}
+
+.chip-brown {
+  background-color: var(--brown);
+}
+
+/* ICONS */
+
+.collage-icon {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  isolation: isolate;
+  filter: drop-shadow(0 10px 14px rgba(52, 31, 21, 0.12));
+  transition: transform 0.22s ease;
+}
+
+.collage-icon:hover {
+  transform: translateY(-3px) rotate(-2deg);
+}
+
+.collage-icon-back {
+  position: absolute;
+  inset: -0.36rem;
+  z-index: 0;
+  background: #fffaf2;
+  border-radius: 1rem;
+  transform: rotate(-4deg);
+}
+
+.collage-icon-inner {
+  position: relative;
+  z-index: 1;
+  width: 2.95rem;
+  height: 2.95rem;
+  display: grid;
+  place-items: center;
+  border-radius: 1rem;
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 280px 280px;
+  background-blend-mode: multiply;
+  color: #fffaf4;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.icon-red {
+  background-color: var(--red);
+}
+
+.icon-teal {
+  background-color: var(--teal);
+}
+
+.icon-mustard {
+  background-color: var(--mustard);
+}
+
+.icon-sage {
+  background-color: var(--sage);
+}
+
+.icon-terra {
+  background-color: var(--terra);
+}
+
+/* HERO */
+
+.hero-section {
+  position: relative;
+  padding-block: 0 4rem;
+  overflow: visible;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) 360px;
+  gap: 1.6rem;
+  align-items: start;
+  min-height: auto;
+  padding-top: 0.35rem;
+}
+
+.hero-main-inner {
+  padding: 2rem 2rem 1.9rem;
+}
+
+.hero-topline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.hero-title,
+.section-title,
+.contact-title,
+.item-title,
+.hero-side-title {
+  font-family: var(--font-display);
+  font-weight: 950;
+  letter-spacing: -0.035em;
+}
+
+.hero-title {
+  margin: 0;
+  max-width: 14.8ch;
+  font-size: clamp(2.35rem, 5.25vw, 5.05rem);
+  line-height: 0.94;
+  letter-spacing: -0.07em;
+}
+
+.hero-title-line {
+  display: block;
+  white-space: nowrap;
+}
+
+.hero-letterline {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  margin-top: 1rem;
+  transform-origin: left center;
+}
+
+.hero-letterline .letter-word {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.hero-subtitle,
+.section-description,
+.item-description,
+.contact-description,
+.hero-side-text,
+.mini-pill-text {
+  font-family: var(--font-body);
+  font-weight: 650;
+}
+
+.hero-subtitle {
+  max-width: 52rem;
+  margin: 1.4rem 0 0;
+  font-size: 1.06rem;
+  line-height: 1.8;
+  color: var(--ink-soft);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.4rem;
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.4rem;
+}
+
+.hero-topline .info-chip,
+.hero-tags .info-chip,
+.instagram-kicker-row .info-chip,
+.place-card .card-top .info-chip {
+  --badge-x: 0px;
+  --badge-y: 0px;
+  --badge-hover-y: 0px;
+  --badge-rotate: -1deg;
+  animation: badgeLetterJump 7.5s steps(1, end) infinite;
+  transform:
+    translate(
+      var(--badge-x),
+      calc(var(--badge-y) + var(--badge-hover-y))
+    )
+    rotate(var(--badge-rotate));
+  transform-origin: center;
+}
+
+.hero-topline .info-chip:nth-child(1),
+.hero-tags .info-chip:nth-child(1),
+.instagram-kicker-row .info-chip:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.hero-topline .info-chip:nth-child(2),
+.hero-tags .info-chip:nth-child(2),
+.instagram-kicker-row .info-chip:nth-child(2) {
+  animation-delay: -0.6s;
+}
+
+.hero-topline .info-chip:nth-child(3),
+.hero-tags .info-chip:nth-child(3),
+.instagram-kicker-row .info-chip:nth-child(3) {
+  animation-delay: -1.2s;
+}
+
+.hero-tags .info-chip:nth-child(4) {
+  animation-delay: -1.8s;
+}
+
+.hero-tags .info-chip:nth-child(5) {
+  animation-delay: -2.4s;
+}
+
+.hero-tags .info-chip:nth-child(6) {
+  animation-delay: -3s;
+}
+
+.place-card-shell:nth-child(1) .place-card .card-top .info-chip {
+  animation-delay: -0.2s;
+}
+
+.place-card-shell:nth-child(2) .place-card .card-top .info-chip {
+  animation-delay: -0.85s;
+}
+
+.place-card-shell:nth-child(3) .place-card .card-top .info-chip {
+  animation-delay: -1.5s;
+}
+
+.hero-topline .info-chip:hover,
+.hero-tags .info-chip:hover,
+.instagram-kicker-row .info-chip:hover,
+.place-card .card-top .info-chip:hover {
+  --badge-hover-y: -4px;
+  box-shadow:
+    0 12px 16px rgba(52, 31, 21, 0.16),
+    0 4px 8px rgba(52, 31, 21, 0.12);
+  filter: brightness(1.04) saturate(1.06);
+}
+
+.hero-side {
+  position: relative;
+}
+
+.hero-side-animated-card {
+  animation: heroSideFloat 10.5s ease-in-out infinite;
+  transform-origin: center;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+.hero-side-animated-card:hover {
+  animation-play-state: paused;
+}
+
+.hero-side-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.hero-vinyl {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background-color: var(--ink);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 180px 180px;
+  background-blend-mode: multiply;
+  color: #fffaf4;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.08),
+    0 10px 18px rgba(52, 31, 21, 0.14);
+  animation: vinylSpin 15s linear infinite;
+}
+
+.hero-side-title {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+  line-height: 1.02;
+}
+
+.hero-side-text {
+  margin: 0.85rem 0 0;
+  color: var(--ink-soft);
+  font-size: clamp(0.92rem, 1.15vw, 0.98rem);
+  line-height: 1.7;
+}
+
+.mini-pills {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1.1rem;
+}
+
+.mini-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.72rem 0.8rem;
+  border: 1px solid rgba(52, 31, 21, 0.08);
+  background-color: var(--paper-light);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 440px 440px;
+  background-blend-mode: multiply;
+  border-radius: 1rem;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.mini-pill-title {
+  margin: 0;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 950;
+}
+
+.mini-pill-text {
+  margin: 0.16rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.floating-chip {
+  position: absolute;
+  z-index: 3;
+}
+
+.floating-chip-a {
+  right: -4rem;
+  bottom: -1rem;
+  transform: rotate(-6deg);
+}
+
+.floating-chip-a .info-chip {
+  box-shadow:
+    0 18px 28px rgba(52, 31, 21, 0.28),
+    0 6px 12px rgba(52, 31, 21, 0.18);
+}
+
+/* LETTER BLOCKS */
+
+.letter-word {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: clamp(0.08rem, 0.38vw, 0.2rem);
+}
+
+.letter-space {
+  width: 0.45em;
+}
+
+.letter-block {
+  --rotate: 0deg;
+  --float-x: 0px;
+  --float-y: 0px;
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  min-width: 0.74em;
+  padding: 0.045em 0.11em 0.1em;
+  color: #fff9f3;
+  font-weight: 950;
+  line-height: 0.92;
+  box-shadow: 0 8px 14px rgba(52, 31, 21, 0.12);
+  overflow: hidden;
+  transform: translate(var(--float-x), var(--float-y)) rotate(var(--rotate));
+  animation: wornLetterFloat 5.2s ease-in-out infinite;
+  animation-delay: calc(var(--letter-index, 0) * -0.34s);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease;
+}
+
+.letter-block:hover {
+  transform: translateY(-4px) rotate(var(--rotate));
+  box-shadow: 0 12px 16px rgba(52, 31, 21, 0.16);
+  filter: brightness(1.04);
+}
+
+.letter-block:nth-child(1) { --letter-index: 1; }
+.letter-block:nth-child(2) { --letter-index: 2; }
+.letter-block:nth-child(3) { --letter-index: 3; }
+.letter-block:nth-child(4) { --letter-index: 4; }
+.letter-block:nth-child(5) { --letter-index: 5; }
+.letter-block:nth-child(6) { --letter-index: 6; }
+.letter-block:nth-child(7) { --letter-index: 7; }
+.letter-block:nth-child(8) { --letter-index: 8; }
+.letter-block:nth-child(9) { --letter-index: 9; }
+.letter-block:nth-child(10) { --letter-index: 10; }
+
+.letter-block::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background:
+    linear-gradient(135deg, rgba(255, 248, 239, 0.13), transparent 38%),
+    radial-gradient(circle at 18% 22%, rgba(255, 248, 239, 0.22), transparent 19%),
+    radial-gradient(circle at 78% 75%, rgba(52, 31, 21, 0.18), transparent 28%),
+    url("/textures/paper-fiber.jpg");
+  background-size: 100% 100%, 100% 100%, 100% 100%, 260px 260px;
+  opacity: 0.48;
+  mix-blend-mode: multiply;
+}
+
+.letter-block::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 32%, transparent 0 2px, rgba(255, 248, 239, 0.2) 2.6px, transparent 4px),
+    radial-gradient(circle at 73% 68%, transparent 0 2.4px, rgba(52, 31, 21, 0.16) 3px, transparent 4.8px),
+    repeating-linear-gradient(
+      108deg,
+      transparent 0 9px,
+      rgba(255, 248, 239, 0.16) 9px 10px,
+      transparent 10px 19px
+    );
+  background-size: 19px 17px, 23px 21px, 100% 100%;
+  opacity: 0.38;
+  mix-blend-mode: screen;
+}
+
+.letter-block span {
+  position: relative;
+  z-index: 1;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.14),
+    0 2px 3px rgba(52, 31, 21, 0.16);
+}
+
+.letter-red { background-color: var(--red); }
+.letter-mustard { background-color: var(--mustard); }
+.letter-teal { background-color: var(--teal); }
+.letter-sage { background-color: var(--sage); }
+.letter-terra { background-color: var(--terra); }
+
+.hero-title .hero-letterline .letter-block {
+  font-family: "Rubik Dirt", var(--font-display);
+  font-weight: 400;
+}
+
+/* STRIPS / CONTENT */
+
+.poster-strip {
+  margin-top: 0.8rem;
+  background-color: #472918;
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 580px 580px;
+  background-blend-mode: multiply;
+  color: #fff7ed;
+  box-shadow:
+    0 12px 24px rgba(52, 31, 21, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.poster-strip-dark {
+  margin-top: 2.2rem;
+}
+
+.poster-strip-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 64px;
+  padding: 0.9rem 0;
+}
+
+.poster-strip-inner p {
+  margin: 0;
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.poster-dot {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  display: inline-block;
+  box-shadow: 0 0 0 2px rgba(255, 248, 239, 0.1);
+}
+
+.poster-dot-red { background: var(--red); }
+.poster-dot-teal { background: var(--teal); }
+.poster-dot-mustard { background: var(--mustard); }
+
+.section-intro-card {
+  max-width: 860px;
+}
+
+.section-kicker {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 950;
+  color: var(--red-dark);
+}
+
+.section-title {
+  margin: 0.8rem 0 0;
+  font-size: clamp(2rem, 3.8vw, 3.3rem);
+  line-height: 0.98;
+}
+
+.section-description {
+  margin: 1rem 0 0;
+  max-width: 60rem;
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.service-top {
+  justify-content: flex-start;
+}
+
+.event-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ghost-number {
+  flex: 0 0 auto;
+  font-size: 2.4rem;
+  line-height: 1;
+  font-weight: 950;
+  color: rgba(52, 31, 21, 0.1);
+  letter-spacing: -0.05em;
+}
+
+.eyebrow-meta {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--red-dark);
+}
+
+.item-title {
+  margin: 0;
+  font-size: 1.65rem;
+  line-height: 1.08;
+}
+
+.item-title-sm {
+  margin-top: 0.8rem;
+  font-size: 1.28rem;
+}
+
+.item-description {
+  margin: 0.8rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.98rem;
+  line-height: 1.8;
+}
+
+.item-description-sm {
+  font-size: 0.95rem;
+}
+
+.soft-info-box {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.82rem 0.9rem;
+  border-radius: 1rem;
+  background-color: rgba(248, 237, 218, 0.78);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 440px 440px;
+  background-blend-mode: multiply;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  font-weight: 700;
+}
+
+/* INSTAGRAM */
+
+.instagram-section-wrap {
+  margin-top: 1.4rem;
+}
+
+.instagram-collage {
+  position: relative;
+  overflow: visible;
+  border-radius: 1.8rem;
+  padding: 1.4rem;
+  background-color: rgba(241, 223, 191, 0.86);
+  background-image:
+    linear-gradient(135deg, rgba(255, 250, 242, 0.48), transparent 42%),
+    url("/textures/paper-fiber.jpg");
+  background-size: 100% 100%, 620px 620px;
+  background-blend-mode: normal, multiply;
+  box-shadow:
+    0 18px 34px rgba(52, 31, 21, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.instagram-collage::before,
+.instagram-collage::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 320px 320px;
+  background-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.instagram-collage::before {
+  left: -1.1rem;
+  top: 2rem;
+  width: 5.4rem;
+  height: 5.4rem;
+  background-color: var(--red);
+  opacity: 0.2;
+  transform: rotate(-8deg);
+}
+
+.instagram-collage::after {
+  right: -1.2rem;
+  bottom: 2.4rem;
+  width: 7rem;
+  height: 7rem;
+  background-color: var(--teal);
+  opacity: 0.18;
+  transform: rotate(8deg);
+}
+
+.instagram-collage-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+
+.instagram-kicker-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-bottom: 0.9rem;
+}
+
+.instagram-title {
+  margin: 0;
+  max-width: 42rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.2vw, 3rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+
+.instagram-description {
+  max-width: 44rem;
+  margin: 0.9rem 0 0;
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.75;
+  font-weight: 650;
+}
+
+.instagram-profile-button {
+  flex: 0 0 auto;
+}
+
+.instagram-feed-frame {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  border: 1px solid rgba(52, 31, 21, 0.12);
+  border-radius: 1.45rem;
+  padding: 1rem;
+  background-color: rgba(248, 237, 218, 0.72);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 560px 560px;
+  background-blend-mode: multiply;
+  box-shadow:
+    0 14px 24px rgba(52, 31, 21, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38);
+}
+
+.instagram-feed-texture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(171, 50, 43, 0.08), transparent 28%),
+    radial-gradient(circle at 88% 82%, rgba(47, 152, 163, 0.08), transparent 32%);
+}
+
+.behold-feed-wrapper {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 1rem;
+}
+
+.instagram-empty-card {
+  position: relative;
+  z-index: 1;
+  border: 1px dashed rgba(52, 31, 21, 0.22);
+  border-radius: 1.2rem;
+  padding: 2rem;
+  text-align: center;
+  background-color: rgba(255, 250, 242, 0.46);
+}
+
+.instagram-empty-kicker {
+  margin: 0;
+  color: var(--red-dark);
+  font-size: 0.72rem;
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.instagram-empty-text {
+  max-width: 42rem;
+  margin: 1rem auto 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  font-weight: 700;
+}
+
+.instagram-empty-text code {
+  display: inline-flex;
+  padding: 0.18rem 0.38rem;
+  border-radius: 0.4rem;
+  background: rgba(52, 31, 21, 0.08);
+  color: var(--ink);
+  font-size: 0.86em;
+  font-weight: 900;
+}
+
+/* INSTAGRAM -> LOCAIS SEPARATOR */
+
+.instagram-locais-separator {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2.6rem;
+  margin-bottom: 1rem;
+  isolation: isolate;
+}
+
+.instagram-locais-separator::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: -1;
+  width: min(560px, 80vw);
+  height: 4.8rem;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 30% 50%, rgba(171, 50, 43, 0.16), transparent 48%),
+    radial-gradient(circle at 70% 50%, rgba(47, 152, 163, 0.14), transparent 48%);
+  transform: translate(-50%, -50%);
+  filter: blur(8px);
+  opacity: 0.9;
+  animation: separatorGlowPulse 8s ease-in-out infinite;
+}
+
+.separator-line {
+  display: block;
+  height: 2px;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(52, 31, 21, 0.16) 18%,
+      rgba(52, 31, 21, 0.34) 50%,
+      rgba(52, 31, 21, 0.16) 82%,
+      transparent 100%
+    );
+  transform-origin: center;
+  animation: separatorLineDrift 7s ease-in-out infinite;
+}
+
+.separator-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.68rem 1rem;
+  border: 1px solid rgba(52, 31, 21, 0.14);
+  border-radius: 999px;
+  background-color: var(--red);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 360px 360px;
+  background-blend-mode: multiply;
+  color: #fffaf4;
+  font-size: 0.68rem;
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  box-shadow:
+    0 14px 22px rgba(52, 31, 21, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transform: rotate(-1deg);
+  animation: separatorBadgeFloat 6.8s ease-in-out infinite;
+}
+
+
+.separator-badge {
+  min-height: 2.45rem;
+  line-height: 1;
+}
+
+.separator-badge > span {
+  display: inline-flex;
+  align-items: center;
+  height: auto;
+  line-height: 1;
+  padding-top: 0.03rem;
+  background: none;
+}
+
+.separator-badge svg {
+  display: block;
+  flex: 0 0 auto;
+  transform: translateY(-0.5px);
+}
+
+/* PLACES */
+
+.places-section-block {
+  padding-top: 1rem;
+}
+
+.places-intro-card {
+  max-width: 940px;
+}
+
+.places-intro-inner {
+  display: block;
+}
+
+.places-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.95rem;
+}
+
+.places-title-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 3.15rem;
+  height: 3.15rem;
+  margin-top: 0.05rem;
+  border-radius: 1.05rem;
+  background-color: var(--teal);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 280px 280px;
+  background-blend-mode: multiply;
+  color: #fffaf4;
+  box-shadow:
+    0 12px 18px rgba(52, 31, 21, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transform: rotate(-3deg);
+}
+
+.places-title-content {
+  min-width: 0;
+}
+
+.places-title-content .section-title {
+  margin-top: 0.55rem;
+}
+
+.places-intro-description {
+  margin-left: calc(3.15rem + 0.95rem);
+}
+
+.place-card-shell {
+  display: block;
+  cursor: pointer;
+  outline: none;
+}
+
+.place-card-shell:focus-visible {
+  border-radius: 1.4rem;
+  outline: 3px solid rgba(47, 152, 163, 0.38);
+  outline-offset: 6px;
+}
+
+.place-card {
+  height: 100%;
+  transition:
+    transform 0.28s ease,
+    filter 0.28s ease;
+}
+
+.place-card-shell:hover .place-card.standard-paper-card,
+.place-card-shell:focus-visible .place-card.standard-paper-card {
+  transform: translateY(-7px) rotate(-0.45deg) !important;
+  filter: drop-shadow(0 24px 34px rgba(52, 31, 21, 0.22));
+}
+
+.place-card-shell:hover .place-card .collage-icon,
+.place-card-shell:focus-visible .place-card .collage-icon {
+  transform: translateY(-3px) rotate(-2deg) !important;
+}
+
+.place-card-shell:hover .place-card .info-chip,
+.place-card-shell:focus-visible .place-card .info-chip {
+  filter: brightness(1.04) saturate(1.06) !important;
+}
+
+.place-details-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: fit-content;
+  margin-top: 1.1rem;
+  padding: 0.68rem 0.9rem;
+  border: 1px solid rgba(52, 31, 21, 0.14);
+  border-radius: 999px;
+  background-color: var(--paper-light);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 360px 360px;
+  background-blend-mode: multiply;
+  color: var(--ink);
+  font-size: 0.7rem;
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow:
+    0 10px 16px rgba(52, 31, 21, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.46);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.place-details-button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 14px 20px rgba(52, 31, 21, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  filter: saturate(1.05);
+}
+
+
+.place-logo-mark,
+.place-modal-logo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+  background-color: rgba(255, 250, 242, 0.76);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 320px 320px;
+  background-blend-mode: multiply;
+  border: 1px solid rgba(52, 31, 21, 0.12);
+  box-shadow:
+    0 12px 18px rgba(52, 31, 21, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.place-logo-mark {
+  width: 3.35rem;
+  height: 3.35rem;
+  border-radius: 1.05rem;
+  transform: rotate(-3deg);
+  transition: transform 0.22s ease, filter 0.22s ease;
+}
+
+.place-logo-mark img,
+.place-modal-logo img {
+  display: block;
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  filter:
+    contrast(1.08)
+    saturate(1.05)
+    drop-shadow(0 2px 2px rgba(52, 31, 21, 0.14));
+}
+
+.place-card-shell:hover .place-logo-mark,
+.place-card-shell:focus-visible .place-logo-mark {
+  transform: translateY(-3px) rotate(-5deg);
+  filter: brightness(1.04) saturate(1.06);
+}
+
+.place-modal-logo {
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: 1.1rem;
+  transform: rotate(-3deg);
+}
+
+/* PLACE MODAL */
+
+.place-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(171, 50, 43, 0.22), transparent 34%),
+    radial-gradient(circle at 80% 80%, rgba(47, 152, 163, 0.2), transparent 34%),
+    rgba(52, 31, 21, 0.52);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.place-modal-card {
+  position: relative;
+  width: min(1040px, 100%);
+  max-height: min(84vh, 760px);
+  overflow: auto;
+  border-radius: 1.7rem;
+  padding: 1.25rem;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(135deg, rgba(255, 250, 242, 0.52), transparent 44%),
+    url("/textures/paper-fiber.jpg");
+  background-size: 100% 100%, 620px 620px;
+  background-blend-mode: normal, multiply;
+  box-shadow:
+    0 30px 70px rgba(52, 31, 21, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.44);
+}
+
+.place-modal-close {
+  position: sticky;
+  top: 0.2rem;
+  float: right;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-left: auto;
+  border: 1px solid rgba(52, 31, 21, 0.14);
+  border-radius: 999px;
+  background-color: var(--paper-light);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 8px 14px rgba(52, 31, 21, 0.12);
+}
+
+.place-modal-layout {
+  clear: both;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.place-modal-gallery {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 0.75rem;
+  min-height: 100%;
+}
+
+.place-modal-main-photo,
+.place-modal-thumb {
+  background:
+    linear-gradient(135deg, rgba(52, 31, 21, 0.18), rgba(52, 31, 21, 0.02)),
+    var(--place-photo);
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(52, 31, 21, 0.14);
+  background-blend-mode: multiply, normal;
+}
+
+.place-modal-main-photo {
+  position: relative;
+  min-height: 420px;
+  overflow: hidden;
+  border-radius: 1.35rem;
+  padding: 1rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 16px 28px rgba(52, 31, 21, 0.16);
+}
+
+.place-modal-main-photo::after,
+.place-modal-thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 420px 420px;
+  opacity: 0.16;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.place-modal-thumbs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.place-modal-thumb {
+  position: relative;
+  min-height: 112px;
+  overflow: hidden;
+  border-radius: 1rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.place-modal-info {
+  padding: 0.6rem 0.35rem 0.25rem;
+}
+
+.place-modal-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.95rem;
+  padding-right: 2.7rem;
+  margin-bottom: 1rem;
+}
+
+.place-modal-title {
+  margin: 0;
+  max-width: 32rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+
+.place-modal-description {
+  margin: 1rem 0 0;
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.8;
+  font-weight: 650;
+}
+
+.place-modal-info-grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.15rem;
+}
+
+.place-modal-info-item,
+.place-modal-event-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.82rem 0.9rem;
+  border-radius: 1rem;
+  background-color: rgba(248, 237, 218, 0.78);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 440px 440px;
+  background-blend-mode: multiply;
+  color: var(--ink-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
+}
+
+.place-modal-info-item p {
+  margin: 0;
+  color: var(--red-dark);
+  font-size: 0.7rem;
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.place-modal-info-item span,
+.place-modal-event-item span {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  font-weight: 750;
+}
+
+.place-modal-events {
+  margin-top: 1.15rem;
+}
+
+.place-modal-section-label {
+  margin: 0 0 0.7rem;
+  color: var(--red-dark);
+  font-size: 0.72rem;
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.place-modal-event-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.place-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.3rem;
+}
+
+/* AGENDA / CONTACT / FOOTER */
+
+.agenda-poster {
+  position: relative;
+  min-height: 240px;
+  overflow: hidden;
+  border-radius: 1.2rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  transition: transform 0.3s ease;
+}
+
+.poster-red {
+  background-color: var(--red);
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(216, 154, 27, 0.38), transparent 34%),
+    url("/textures/paper-fiber.jpg");
+  background-size: 100% 100%, 560px 560px;
+  background-blend-mode: normal, multiply;
+}
+
+.poster-teal {
+  background-color: var(--teal);
+  background-image:
+    radial-gradient(circle at 80% 25%, rgba(127, 199, 207, 0.4), transparent 34%),
+    url("/textures/paper-fiber.jpg");
+  background-size: 100% 100%, 560px 560px;
+  background-blend-mode: normal, multiply;
+}
+
+.agenda-poster-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 420px 420px;
+  opacity: 0.12;
+  mix-blend-mode: multiply;
+}
+
+.agenda-poster-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
+}
+
+.agenda-poster-title {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 2;
+  font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+}
+
+.agenda-body {
+  padding-top: 0.2rem;
+}
+
+.agenda-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.72rem;
+  border-radius: 999px;
+  background-color: var(--paper-light);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 320px 320px;
+  background-blend-mode: multiply;
+  color: var(--ink-soft);
+  font-size: 0.76rem;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.agenda-place {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.95rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 900;
+  line-height: 1.5;
+  color: var(--red-dark);
+}
+
+.contact-block {
+  padding-bottom: 2rem;
+}
+
+.contact-card {
+  max-width: 840px;
+  margin-inline: auto;
+}
+
+.contact-card-inner {
+  text-align: center;
+  padding: 2rem;
+}
+
+.contact-title {
+  margin: 0.8rem 0 0;
+  font-size: clamp(2.1rem, 4.4vw, 4rem);
+  line-height: 0.98;
+}
+
+.contact-description {
+  max-width: 42rem;
+  margin: 1rem auto 0;
+  color: var(--ink-soft);
+  font-size: 1.02rem;
+  line-height: 1.85;
+}
+
+.contact-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.4rem;
+}
+
+.footer-shell {
+  padding-bottom: 2rem;
+}
+
+.footer-card {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem;
+  border-radius: 1rem;
+  background-color: var(--paper-light);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 520px 520px;
+  background-blend-mode: multiply;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  font-weight: 700;
+  box-shadow: var(--shadow-soft);
+}
+
+.footer-card p {
+  margin: 0;
+}
+
+/* DISABLE CONTENT CARD HOVERS */
+
+.standard-paper-card:hover:not(.hero-side-animated-card):not(.place-card),
+.hero-main-card:hover,
+.contact-card:hover {
+  transform: none !important;
+}
+
+.standard-paper-card:hover:not(.hero-side-animated-card):not(.place-card) .agenda-poster {
+  transform: none !important;
+}
+
+.standard-paper-card:hover:not(.hero-side-animated-card):not(.place-card) .mini-pill,
+.standard-paper-card:hover:not(.hero-side-animated-card):not(.place-card) .meta-pill,
+.standard-paper-card:hover:not(.hero-side-animated-card):not(.place-card) .info-chip:not(.instagram-kicker-row .info-chip),
+.standard-paper-card:hover:not(.hero-side-animated-card):not(.place-card) .collage-icon,
+.contact-card:hover .info-chip {
+  transform: none !important;
+  filter: none !important;
+}
+
+.hero-main-card:hover .info-chip,
+.instagram-collage:hover .instagram-kicker-row .info-chip {
+  filter: none;
+}
+
+.mini-pill:hover,
+.meta-pill:hover,
+.standard-paper-card .info-chip:hover:not(.instagram-kicker-row .info-chip):not(.place-card .card-top .info-chip),
+.contact-card .info-chip:hover,
+.collage-icon:hover,
+.agenda-poster:hover {
+  transform: none !important;
+  filter: none !important;
+}
+
+.hero-topline .info-chip:hover,
+.hero-tags .info-chip:hover,
+.instagram-kicker-row .info-chip:hover,
+.place-card .card-top .info-chip:hover {
+  transform:
+    translate(
+      var(--badge-x),
+      calc(var(--badge-y) + var(--badge-hover-y))
+    )
+    rotate(var(--badge-rotate)) !important;
+}
+
+.mini-pill:hover,
+.meta-pill:hover {
+  box-shadow: inherit !important;
+}
+
+.standard-paper-card .info-chip:hover:not(.instagram-kicker-row .info-chip):not(.place-card .card-top .info-chip),
+.contact-card .info-chip:hover {
+  box-shadow: 0 8px 12px rgba(52, 31, 21, 0.1) !important;
+}
+
+.floating-chip-a .info-chip:hover {
+  box-shadow:
+    0 18px 28px rgba(52, 31, 21, 0.28),
+    0 6px 12px rgba(52, 31, 21, 0.18) !important;
+}
+
+
+.place-card .card-top .info-chip,
+.place-card .card-top .info-chip:hover {
+  transform:
+    translate(
+      var(--badge-x),
+      calc(var(--badge-y) + var(--badge-hover-y))
+    )
+    rotate(var(--badge-rotate)) !important;
+}
+
+/* ANIMATIONS */
+
+@keyframes rayAngleDrift {
+  from {
+    --ray-angle: -12deg;
+  }
+
+  to {
+    --ray-angle: 348deg;
+  }
+}
+
+@keyframes vinylSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes wornLetterFloat {
+  0%,
+  100% {
+    --float-x: 0px;
+    --float-y: 0px;
+  }
+
+  22% {
+    --float-x: 0.8px;
+    --float-y: -1.4px;
+  }
+
+  48% {
+    --float-x: -0.6px;
+    --float-y: 1px;
+  }
+
+  72% {
+    --float-x: 0.4px;
+    --float-y: -0.7px;
+  }
+}
+
+@keyframes badgeLetterJump {
+  0%,
+  100% {
+    --badge-x: 0px;
+    --badge-y: 0px;
+    --badge-rotate: -1deg;
+  }
+
+  18% {
+    --badge-x: 0.5px;
+    --badge-y: -1.5px;
+    --badge-rotate: -1.8deg;
+  }
+
+  28% {
+    --badge-x: -0.5px;
+    --badge-y: 0.5px;
+    --badge-rotate: 0.4deg;
+  }
+
+  46% {
+    --badge-x: 1px;
+    --badge-y: -1px;
+    --badge-rotate: 0.8deg;
+  }
+
+  58% {
+    --badge-x: 0px;
+    --badge-y: 0px;
+    --badge-rotate: -1deg;
+  }
+
+  76% {
+    --badge-x: -1px;
+    --badge-y: -1.5px;
+    --badge-rotate: -1.4deg;
+  }
+
+  86% {
+    --badge-x: 0.5px;
+    --badge-y: 0.5px;
+    --badge-rotate: 0.4deg;
+  }
+}
+
+@keyframes heroSideFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+
+  25% {
+    transform: translate3d(3px, -9px, 0) rotate(-0.45deg);
+  }
+
+  50% {
+    transform: translate3d(-2px, 4px, 0) rotate(0.3deg);
+  }
+
+  75% {
+    transform: translate3d(2px, -6px, 0) rotate(-0.25deg);
+  }
+}
+
+@keyframes separatorGlowPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: translate(-50%, -50%) scaleX(0.92);
+  }
+
+  50% {
+    opacity: 0.95;
+    transform: translate(-50%, -50%) scaleX(1.04);
+  }
+}
+
+@keyframes separatorLineDrift {
+  0%,
+  100% {
+    transform: scaleX(0.96);
+    opacity: 0.72;
+  }
+
+  50% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes separatorBadgeFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+
+  50% {
+    transform: translateY(-3px) rotate(1deg);
+  }
+}
+
+/* UI */
+
+::selection {
+  background: rgba(171, 50, 43, 0.88);
+  color: #fffaf4;
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f6ead6;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(52, 31, 21, 0.24);
+  border: 3px solid #f6ead6;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(52, 31, 21, 0.38);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1180px) {
+  .card-grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero-grid,
+  .place-modal-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-side {
+    max-width: 420px;
+  }
+
+  .hero-title {
+    max-width: 12.5ch;
+    font-size: clamp(2.45rem, 7vw, 4.75rem);
+  }
+
+  .hero-letterline {
+    transform: scale(0.96);
+  }
+
+  .place-modal-main-photo {
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 980px) {
+  .site-nav {
+    grid-template-columns: auto auto;
+    border-radius: 2rem;
+  }
+
+  .site-nav-links {
+    grid-column: 1 / -1;
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .section-header-row,
+  .instagram-collage-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .card-grid-3,
+  .card-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .instagram-profile-button {
+    width: fit-content;
+  }
+}
+
+@media (max-width: 720px) {
+  .section-shell {
+    width: min(100% - 1rem, 100%);
+  }
+
+  .standard-paper-card-inner {
+    padding: 1.2rem;
+  }
+
+  .hero-title {
+    max-width: 100%;
+    font-size: clamp(2.15rem, 11vw, 3.8rem);
+    letter-spacing: -0.065em;
+  }
+
+  .hero-letterline {
+    max-width: 100%;
+    transform: scale(0.9);
+  }
+
+  .hero-letterline .letter-word {
+    gap: 0.08rem;
+  }
+
+  .hero-letterline .letter-block {
+    min-width: 0.66em;
+    padding: 0.035em 0.085em 0.085em;
+  }
+
+  .hero-side {
+    max-width: none;
+  }
+
+  .floating-chip {
+    display: none;
+  }
+
+  .poster-strip-inner {
+    gap: 0.65rem;
+  }
+
+  .poster-strip-inner p {
+    letter-spacing: 0.11em;
+  }
+
+  .contact-card-inner {
+    padding: 1.4rem;
+  }
+
+  .card-grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .instagram-locais-separator {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .separator-line {
+    width: 100%;
+  }
+
+  .separator-badge {
+    width: fit-content;
+    margin-inline: auto;
+  }
+
+  .places-title-row {
+    align-items: flex-start;
+  }
+
+  .places-intro-description {
+    margin-left: 0;
+  }
+
+  .place-modal-card {
+    padding: 1rem;
+  }
+
+  .place-modal-main-photo {
+    min-height: 260px;
+  }
+
+  .place-modal-actions .action-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .site-nav {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding: 0.8rem 0.95rem;
+  }
+
+  .brand-logo {
+    height: 2.45rem;
+  }
+
+  .nav-button {
+    width: 100%;
+  }
+
+  .action-button {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.8rem 0.95rem;
+    font-size: 0.74rem;
+  }
+
+  .hero-actions,
+  .contact-actions {
+    flex-direction: column;
+  }
+
+  .hero-topline,
+  .hero-tags {
+    gap: 0.45rem;
+  }
+
+  .info-chip {
+    font-size: 0.62rem;
+    padding: 0.46rem 0.62rem;
+  }
+
+  .section-title {
+    font-size: 1.9rem;
+  }
+
+  .ghost-number {
+    font-size: 2rem;
+  }
+
+  .footer-card {
+    flex-direction: column;
+  }
+
+  .instagram-collage {
+    padding: 1rem;
+    border-radius: 1.35rem;
+  }
+
+  .instagram-feed-frame {
+    padding: 0.7rem;
+    border-radius: 1.1rem;
+  }
+
+  .instagram-title {
+    font-size: 1.7rem;
+  }
+
+  .instagram-profile-button {
+    width: 100%;
+  }
+
+  .places-title-row {
+    flex-direction: column;
+  }
+
+  .place-modal-thumbs {
+    grid-template-columns: 1fr;
+  }
+
+  .place-logo-mark {
+    width: 3.1rem;
+    height: 3.1rem;
+  }
+
+  .place-modal-logo {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+
+}
+
+@media (max-width: 460px) {
+  .hero-letterline {
+    transform: scale(0.78);
+  }
+
+  .hero-title {
+    font-size: clamp(1.95rem, 10.5vw, 3.1rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal,
+  .reveal.visible,
+  .standard-paper-card,
+  .standard-paper-card:hover,
+  .action-button,
+  .action-button:hover,
+  .collage-icon,
+  .collage-icon:hover,
+  .mini-pill,
+  .mini-pill:hover,
+  .meta-pill,
+  .meta-pill:hover,
+  .info-chip,
+  .info-chip:hover,
+  .letter-block,
+  .letter-block:hover,
+  .nav-link,
+  .nav-link:hover,
+  .nav-button,
+  .nav-button:hover,
+  .separator-badge,
+  .separator-line,
+  .instagram-locais-separator::before {
+    transition: none;
+    transform: none;
+    animation: none;
+  }
+
+  .hero-side-animated-card,
+  .hero-side-animated-card:hover,
+  .site-shell::before,
+  .hero-vinyl {
+    animation: none;
+    transform: none;
+  }
+
+  .hero-topline .info-chip,
+  .hero-tags .info-chip,
+  .instagram-kicker-row .info-chip,
+  .place-card .card-top .info-chip {
+    animation: none;
+    transform: rotate(-1deg);
+  }
+}
+
+
+/* =========================
+   FINAL LOCAL LOGOS + BADGES
+   ========================= */
+
+/* Logos dos locais sem fundo/caixinha, apenas a imagem com sombra leve. */
+.place-logo-mark,
+.place-modal-logo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  overflow: visible;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.place-logo-mark {
+  width: 4.4rem;
+  height: 3.15rem;
+  border-radius: 0;
+  transform: rotate(-3deg);
+  transition:
+    transform 0.22s ease,
+    filter 0.22s ease;
+}
+
+.place-logo-mark img,
+.place-modal-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter:
+    contrast(1.08)
+    saturate(1.05)
+    drop-shadow(0 2px 2px rgba(52, 31, 21, 0.18))
+    drop-shadow(0 8px 10px rgba(52, 31, 21, 0.12));
+}
+
+.place-card-shell:hover .place-logo-mark,
+.place-card-shell:focus-visible .place-logo-mark {
+  transform: translateY(-3px) rotate(-5deg);
+  filter: none;
+}
+
+/* Logo do modal maior e alinhada verticalmente com o nome do local. */
+.place-modal-header {
+  align-items: center;
+  gap: 1rem;
+}
+
+.place-modal-logo {
+  width: 6.4rem;
+  height: 3.35rem;
+  border-radius: 0;
+  transform: rotate(-2deg);
+}
+
+.place-modal-logo img {
+  width: 100%;
+  height: 100%;
+}
+
+/* Hover dos cards sem blur/rasterização perceptível. */
+.place-card-shell:hover .place-card.standard-paper-card,
+.place-card-shell:focus-visible .place-card.standard-paper-card {
+  transform: none !important;
+  filter: drop-shadow(0 18px 26px rgba(52, 31, 21, 0.18)) !important;
+}
+
+.place-card-shell:hover .place-card .standard-paper-card-inner,
+.place-card-shell:focus-visible .place-card .standard-paper-card-inner {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 0 0 2px rgba(52, 31, 21, 0.08);
+}
+
+/* Badges dos locais pulando como os badges do hero. */
+.place-status-badge {
+  animation: placeBadgeJump 7.5s steps(1, end) infinite !important;
+  transform-origin: center;
+}
+
+.place-card-shell:nth-child(1) .place-status-badge {
+  animation-delay: -0.2s !important;
+}
+
+.place-card-shell:nth-child(2) .place-status-badge {
+  animation-delay: -0.85s !important;
+}
+
+.place-card-shell:nth-child(3) .place-status-badge {
+  animation-delay: -1.5s !important;
+}
+
+.place-status-badge:hover {
+  transform: translateY(-4px) rotate(-1.5deg) !important;
+  box-shadow:
+    0 12px 16px rgba(52, 31, 21, 0.16),
+    0 4px 8px rgba(52, 31, 21, 0.12) !important;
+  filter: brightness(1.04) saturate(1.06) !important;
+}
+
+@keyframes placeBadgeJump {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(-1deg);
+  }
+
+  18% {
+    transform: translate(0.5px, -1.5px) rotate(-1.8deg);
+  }
+
+  28% {
+    transform: translate(-0.5px, 0.5px) rotate(0.4deg);
+  }
+
+  46% {
+    transform: translate(1px, -1px) rotate(0.8deg);
+  }
+
+  58% {
+    transform: translate(0, 0) rotate(-1deg);
+  }
+
+  76% {
+    transform: translate(-1px, -1.5px) rotate(-1.4deg);
+  }
+
+  86% {
+    transform: translate(0.5px, 0.5px) rotate(0.4deg);
+  }
+}
+
+@media (max-width: 560px) {
+  .place-logo-mark {
+    width: 4rem;
+    height: 3rem;
+  }
+
+  .place-modal-logo {
+    width: 5.4rem;
+    height: 3rem;
+  }
+
+  .place-modal-header {
+    align-items: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .place-status-badge,
+  .place-status-badge:hover {
+    animation: none !important;
+    transform: rotate(-1deg) !important;
+  }
+}
+
+
+/* =========================
+   FINAL FIX: transparent local logos + modal photos
+   ========================= */
+
+/* Remove qualquer fundo vindo de regras antigas ou do PaperCard nos logos dos locais. */
+.card-top .place-logo-mark,
+.place-modal-header .place-modal-logo,
+.place-logo-mark,
+.place-modal-logo {
+  position: relative !important;
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 auto !important;
+  overflow: visible !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  background-size: auto !important;
+  background-blend-mode: normal !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  isolation: auto !important;
+}
+
+.place-logo-mark::before,
+.place-logo-mark::after,
+.place-modal-logo::before,
+.place-modal-logo::after {
+  display: none !important;
+  content: none !important;
+}
+
+.place-logo-mark {
+  width: 5.25rem !important;
+  height: 3.35rem !important;
+  transform: rotate(-3deg);
+  transition:
+    transform 0.22s ease,
+    filter 0.22s ease;
+}
+
+.place-logo-mark img,
+.place-modal-logo img {
+  display: block !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  background: transparent !important;
+  filter:
+    contrast(1.08)
+    saturate(1.05)
+    drop-shadow(0 2px 2px rgba(52, 31, 21, 0.18))
+    drop-shadow(0 8px 10px rgba(52, 31, 21, 0.12));
+}
+
+.place-card-shell:hover .place-logo-mark,
+.place-card-shell:focus-visible .place-logo-mark {
+  transform: translateY(-3px) rotate(-5deg);
+  filter: none !important;
+}
+
+/* Brotero é mais vertical/cheio, então ganha mais área para não cortar. */
+.place-logo-brotero {
+  width: 4.5rem !important;
+  height: 4.1rem !important;
+}
+
+.place-logo-brotero img {
+  width: 92% !important;
+  height: 92% !important;
+}
+
+/* Header do modal: alinha logo ao bloco do nome, sem jogar a logo para cima. */
+.place-modal-header {
+  align-items: center !important;
+  gap: 1rem !important;
+}
+
+.place-modal-logo {
+  width: 7rem !important;
+  height: 3.75rem !important;
+  transform: rotate(-2deg);
+}
+
+.place-modal-logo img {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.place-modal-logo-brotero {
+  width: 5.2rem !important;
+  height: 5.2rem !important;
+}
+
+.place-modal-logo-brotero img {
+  width: 94% !important;
+  height: 94% !important;
+}
+
+/* Modal: imagens reais em img, sem depender de CSS variable em background. */
+.place-modal-main-photo,
+.place-modal-thumb {
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(52, 31, 21, 0.14);
+  background-image:
+    linear-gradient(135deg, rgba(52, 31, 21, 0.16), rgba(52, 31, 21, 0.02)),
+    url("/textures/paper-fiber.jpg");
+  background-size:
+    100% 100%,
+    420px 420px;
+  background-blend-mode:
+    multiply,
+    multiply;
+}
+
+.place-modal-main-photo {
+  min-height: 420px;
+  border-radius: 1.35rem;
+  padding: 1rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 16px 28px rgba(52, 31, 21, 0.16);
+}
+
+.place-modal-main-photo > img,
+.place-modal-thumb > img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.place-modal-main-photo > img {
+  border-radius: inherit;
+}
+
+.place-modal-main-photo > .info-chip {
+  position: relative;
+  z-index: 2;
+}
+
+.place-modal-main-photo::after,
+.place-modal-thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 420px 420px;
+  opacity: 0.14;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.place-modal-thumb {
+  min-height: 112px;
+  border-radius: 1rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+@media (max-width: 1180px) {
+  .place-modal-main-photo {
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 720px) {
+  .place-modal-main-photo {
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 560px) {
+  .place-logo-mark {
+    width: 4.6rem !important;
+    height: 3rem !important;
+  }
+
+  .place-logo-brotero {
+    width: 4rem !important;
+    height: 3.7rem !important;
+  }
+
+  .place-modal-logo {
+    width: 5.8rem !important;
+    height: 3.2rem !important;
+  }
+
+  .place-modal-logo-brotero {
+    width: 4.7rem !important;
+    height: 4.7rem !important;
+  }
+}
+
+
+/* =========================
+   MODAL ICON VERSION
+   ========================= */
+
+/* Modal volta a usar os ícones estilo collage. */
+.place-modal-icon {
+  margin-top: 0;
+}
+
+/* ARCA e Vila Secreta: desce um pouco o ícone dentro do modal. */
+.place-modal-icon-lower {
+  transform: translateY(0.34rem);
+}
+
+/* Mantém o hover global sem deslocar o ícone do modal. */
+.place-modal-icon:hover {
+  transform: none !important;
+}
+
+.place-modal-icon-lower:hover {
+  transform: translateY(0.34rem) !important;
+}
+
+@media (max-width: 560px) {
+  .place-modal-icon-lower {
+    transform: translateY(0.18rem);
+  }
+
+  .place-modal-icon-lower:hover {
+    transform: translateY(0.18rem) !important;
+  }
+}
+
+
+/* =========================
+   FINAL FIX: LOCAL CARD BADGES JUMP
+   ========================= */
+
+/*
+  Os badges dos cards de local precisam usar a animação baseada em variáveis
+  do hero. Assim o transform !important não congela o badge.
+*/
+.place-card .card-top .place-status-badge,
+.place-card .card-top .place-status-badge:hover,
+.place-card-shell:hover .place-card .card-top .place-status-badge,
+.place-card-shell:focus-visible .place-card .card-top .place-status-badge {
+  --badge-x: 0px;
+  --badge-y: 0px;
+  --badge-hover-y: 0px;
+  --badge-rotate: -1deg;
+
+  animation-name: badgeLetterJump !important;
+  animation-duration: 7.5s !important;
+  animation-timing-function: steps(1, end) !important;
+  animation-iteration-count: infinite !important;
+
+  transform:
+    translate(
+      var(--badge-x),
+      calc(var(--badge-y) + var(--badge-hover-y))
+    )
+    rotate(var(--badge-rotate)) !important;
+  transform-origin: center;
+}
+
+.place-card-shell:nth-child(1) .place-card .card-top .place-status-badge {
+  animation-delay: -0.2s !important;
+}
+
+.place-card-shell:nth-child(2) .place-card .card-top .place-status-badge {
+  animation-delay: -0.85s !important;
+}
+
+.place-card-shell:nth-child(3) .place-card .card-top .place-status-badge {
+  animation-delay: -1.5s !important;
+}
+
+.place-card .card-top .place-status-badge:hover {
+  --badge-hover-y: -4px;
+
+  box-shadow:
+    0 12px 16px rgba(52, 31, 21, 0.16),
+    0 4px 8px rgba(52, 31, 21, 0.12) !important;
+  filter: brightness(1.04) saturate(1.06) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .place-card .card-top .place-status-badge,
+  .place-card .card-top .place-status-badge:hover {
+    animation: none !important;
+    transform: rotate(-1deg) !important;
+  }
+}
+
+/* =========================
+   LOCAL CARD BADGES — SAME AS HERO BADGES
+   ========================= */
+
+.place-card .card-top .place-status-badge {
+  --badge-x: 0px;
+  --badge-y: 0px;
+  --badge-hover-y: 0px;
+  --badge-rotate: -1deg;
+
+  animation: badgeLetterJump 7.5s steps(1, end) infinite !important;
+
+  transform:
+    translate(
+      var(--badge-x),
+      calc(var(--badge-y) + var(--badge-hover-y))
+    )
+    rotate(var(--badge-rotate)) !important;
+
+  transform-origin: center;
+}
+
+.place-card-shell:nth-child(1) .place-status-badge {
+  animation-delay: -0.2s !important;
+}
+
+.place-card-shell:nth-child(2) .place-status-badge {
+  animation-delay: -0.85s !important;
+}
+
+.place-card-shell:nth-child(3) .place-status-badge {
+  animation-delay: -1.5s !important;
+}
+
+.place-card .card-top .place-status-badge:hover {
+  --badge-hover-y: -4px;
+
+  transform:
+    translate(
+      var(--badge-x),
+      calc(var(--badge-y) + var(--badge-hover-y))
+    )
+    rotate(var(--badge-rotate)) !important;
+
+  box-shadow:
+    0 12px 16px rgba(52, 31, 21, 0.16),
+    0 4px 8px rgba(52, 31, 21, 0.12) !important;
+
+  filter: brightness(1.04) saturate(1.06) !important;
+}
+
+
+/* =========================
+   FINAL AGENDA IMAGE CARDS
+   ========================= */
+
+.agenda-poster {
+  position: relative;
+  min-height: 280px;
+  overflow: hidden;
+  border-radius: 1.2rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: rgba(52, 31, 21, 0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 14px 24px rgba(52, 31, 21, 0.12);
+}
+
+.agenda-poster-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.agenda-poster-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(52, 31, 21, 0.08) 0%,
+      rgba(52, 31, 21, 0.1) 42%,
+      rgba(52, 31, 21, 0.68) 100%
+    ),
+    url("/textures/paper-fiber.jpg");
+  background-size:
+    100% 100%,
+    420px 420px;
+  background-blend-mode:
+    multiply,
+    multiply;
+  opacity: 1;
+  pointer-events: none;
+}
+
+.agenda-poster-badge {
+  display: none;
+}
+
+.agenda-poster-title {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 2;
+  font-size: clamp(1rem, 2vw, 1.35rem);
+}
+
+.agenda-body {
+  padding-top: 0.15rem;
+}
+
+.agenda-date-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.agenda-date-badge {
+  animation: badgeLetterJump 7.5s steps(1, end) infinite;
+  transform:
+    translate(
+      var(--badge-x, 0px),
+      calc(var(--badge-y, 0px) + var(--badge-hover-y, 0px))
+    )
+    rotate(var(--badge-rotate, -1deg)) !important;
+  transform-origin: center;
+}
+
+.agenda-date-badge:hover {
+  --badge-hover-y: -4px;
+  transform:
+    translate(
+      var(--badge-x, 0px),
+      calc(var(--badge-y, 0px) + var(--badge-hover-y, 0px))
+    )
+    rotate(var(--badge-rotate, -1deg)) !important;
+  box-shadow:
+    0 12px 16px rgba(52, 31, 21, 0.16),
+    0 4px 8px rgba(52, 31, 21, 0.12) !important;
+  filter: brightness(1.04) saturate(1.06) !important;
+}
+
+.poster-red,
+.poster-teal {
+  background-image: none;
+}
+
+@media (max-width: 720px) {
+  .agenda-poster {
+    min-height: 230px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agenda-date-badge,
+  .agenda-date-badge:hover {
+    animation: none !important;
+    transform: rotate(-1deg) !important;
+  }
+}
+
+
+/* =========================
+   FINAL PLACE CARD HOVER CLEANUP
+   ========================= */
+
+/* Remove a bordinha que aparecia no hover/focus dos cards de locais. */
+.place-card-shell:hover .place-card .standard-paper-card-inner,
+.place-card-shell:focus-visible .place-card .standard-paper-card-inner {
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+.place-card-shell:hover,
+.place-card-shell:focus-visible {
+  outline: 0 !important;
+}
+
+/* Hover dos cards de locais: movimento leve, sem criar borda extra. */
+.place-card-shell .place-card.standard-paper-card {
+  transform-origin: center;
+  transition:
+    transform 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 0.34s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.place-card-shell:hover .place-card.standard-paper-card,
+.place-card-shell:focus-visible .place-card.standard-paper-card {
+  transform: translate3d(0, -7px, 0) rotate(-0.45deg) !important;
+  filter: drop-shadow(0 24px 34px rgba(52, 31, 21, 0.22)) !important;
+}
+
+/* Dá um pequeno destaque interno sem borda. */
+.place-card-shell:hover .place-logo-mark,
+.place-card-shell:focus-visible .place-logo-mark {
+  transform: translate3d(0, -4px, 0) rotate(-5deg) !important;
+}
+
+.place-card-shell:hover .place-details-button,
+.place-card-shell:focus-visible .place-details-button {
+  transform: translateY(-2px);
+  box-shadow:
+    0 14px 20px rgba(52, 31, 21, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* Evita que o reset global mate o hover dos cards de locais. */
+.standard-paper-card:hover.place-card {
+  transform: translate3d(0, -7px, 0) rotate(-0.45deg) !important;
+}
+
+/* Mobile: hover mais discreto para não dar sensação de blur. */
+@media (max-width: 720px) {
+  .place-card-shell:hover .place-card.standard-paper-card,
+  .place-card-shell:focus-visible .place-card.standard-paper-card,
+  .standard-paper-card:hover.place-card {
+    transform: translate3d(0, -4px, 0) rotate(-0.25deg) !important;
+  }
+}
+
+
+/* =========================
+   FINAL MODAL PAPER BACKGROUND ONLY
+   ========================= */
+
+/*
+  O modal volta a ter conteúdo estático.
+  O efeito de papel fica somente no container principal que segura todo o conteúdo.
+*/
+.place-modal-card {
+  position: relative;
+  isolation: isolate;
+  overflow: auto !important;
+  padding: 1.25rem !important;
+  border-radius: 1.7rem;
+  background-color: var(--paper) !important;
+  background-image:
+    linear-gradient(135deg, rgba(255, 250, 242, 0.58), transparent 44%),
+    radial-gradient(circle at 14% 18%, rgba(171, 50, 43, 0.08), transparent 30%),
+    radial-gradient(circle at 86% 80%, rgba(47, 152, 163, 0.09), transparent 32%),
+    url("/textures/paper-fiber.jpg") !important;
+  background-size:
+    100% 100%,
+    100% 100%,
+    100% 100%,
+    620px 620px !important;
+  background-blend-mode:
+    normal,
+    normal,
+    normal,
+    multiply !important;
+  box-shadow:
+    0 30px 70px rgba(52, 31, 21, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.44) !important;
+}
+
+/* Camada muito sutil no fundo do modal, sem mexer no conteúdo. */
+.place-modal-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(135deg, rgba(255, 250, 242, 0.18), transparent 42%),
+    radial-gradient(circle at 18% 22%, rgba(255, 250, 242, 0.22), transparent 24%),
+    radial-gradient(circle at 78% 74%, rgba(52, 31, 21, 0.06), transparent 28%);
+  opacity: 0.9;
+  mix-blend-mode: soft-light;
+}
+
+/* Garante que todo o conteúdo fique estático, acima do fundo. */
+.place-modal-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.place-modal-layout,
+.place-modal-gallery,
+.place-modal-main-photo,
+.place-modal-thumbs,
+.place-modal-thumb,
+.place-modal-info,
+.place-modal-header,
+.place-modal-title,
+.place-modal-description,
+.place-modal-info-item,
+.place-modal-event-item,
+.place-modal-actions {
+  animation: none !important;
+}
+
+/* A área de informações continua com textura leve, mas parada. */
+.place-modal-info {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(52, 31, 21, 0.08);
+  border-radius: 1.25rem;
+  padding: 1.05rem !important;
+  background-color: rgba(255, 250, 242, 0.42);
+  background-image:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.32), transparent 42%),
+    url("/textures/paper-fiber.jpg");
+  background-size:
+    100% 100%,
+    420px 420px;
+  background-blend-mode:
+    normal,
+    multiply;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    0 12px 22px rgba(52, 31, 21, 0.08);
+  transform: none !important;
+}
+
+/* Remove qualquer camada animada criada anteriormente na área branca. */
+.place-modal-info::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Título e caixas totalmente estáticos para manter leitura confortável. */
+.place-modal-title,
+.place-modal-info-item,
+.place-modal-event-item {
+  transform: none !important;
+  animation: none !important;
+}
+
+@media (max-width: 720px) {
+  .place-modal-card {
+    padding: 1rem !important;
+  }
+
+  .place-modal-info {
+    padding: 0.95rem !important;
+    border-radius: 1.05rem;
+  }
+}
+
+
+/* =========================
+   FINAL FIX: PAPER ONLY ON MODAL SHELL
+   ========================= */
+
+/*
+  Papel somente no container principal do modal.
+  Não altera o fundo do conteúdo, da coluna de informações, da galeria ou dos blocos internos.
+*/
+.place-modal-card {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: auto !important;
+  padding: 1.45rem !important;
+  border: 1px solid rgba(52, 31, 21, 0.12) !important;
+  border-radius: 1.7rem !important;
+
+  background-color: var(--paper) !important;
+  background-image:
+    linear-gradient(135deg, rgba(255, 250, 242, 0.62), transparent 42%),
+    radial-gradient(circle at 12% 16%, rgba(171, 50, 43, 0.08), transparent 30%),
+    radial-gradient(circle at 86% 82%, rgba(47, 152, 163, 0.09), transparent 32%),
+    url("/textures/paper-fiber.jpg") !important;
+  background-size:
+    100% 100%,
+    100% 100%,
+    100% 100%,
+    620px 620px !important;
+  background-position:
+    center,
+    center,
+    center,
+    center !important;
+  background-repeat:
+    no-repeat,
+    no-repeat,
+    no-repeat,
+    repeat !important;
+  background-blend-mode:
+    normal,
+    normal,
+    normal,
+    multiply !important;
+
+  box-shadow:
+    0 30px 70px rgba(52, 31, 21, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.46) !important;
+}
+
+/* Remove camadas/pseudos antigos que podiam dar a impressão de fundo no conteúdo. */
+.place-modal-card::before,
+.place-modal-card::after {
+  display: none !important;
+  content: none !important;
+}
+
+/*
+  A layout NÃO recebe fundo.
+  Ela fica transparente para revelar o papel do .place-modal-card nas áreas livres/gaps.
+*/
+.place-modal-layout {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+/*
+  Conteúdo interno fica estático.
+  Não colocamos papel aqui; só garantimos que nenhuma animação anterior continue.
+*/
+.place-modal-info,
+.place-modal-gallery,
+.place-modal-main-photo,
+.place-modal-thumbs,
+.place-modal-thumb,
+.place-modal-header,
+.place-modal-title,
+.place-modal-description,
+.place-modal-info-item,
+.place-modal-event-item,
+.place-modal-actions {
+  animation: none !important;
+}
+
+.place-modal-title,
+.place-modal-info-item,
+.place-modal-event-item {
+  transform: none !important;
+}
+
+/* Remove apenas pseudo animado antigo da área de informações, sem redefinir o fundo dela. */
+.place-modal-info::before,
+.place-modal-info::after {
+  display: none !important;
+  content: none !important;
+}
+
+/*
+  Como o papel fica no modal shell, aumentamos um pouco o respiro interno
+  para ele aparecer ao redor da galeria e da coluna de informações.
+*/
+.place-modal-card .place-modal-layout {
+  gap: 1.35rem;
+}
+
+@media (max-width: 720px) {
+  .place-modal-card {
+    padding: 1.05rem !important;
+  }
+
+  .place-modal-card .place-modal-layout {
+    gap: 1rem;
+  }
+}
+
+
+/* =========================
+   FINAL HEADER DOCK / FLOAT BEHAVIOR — STRONG VERSION
+   ========================= */
+
+/*
+  Esta versão usa duas garantias:
+  1) classe no header: .site-header-docked / .site-header-floating
+  2) classe no main: .site-shell.is-at-top / .site-shell.is-scrolled
+
+  Assim, mesmo se uma regra antiga competir, o estado visual ainda aplica.
+*/
+
+.site-header {
+  transition:
+    padding 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  will-change: padding, transform;
+}
+
+.site-header .site-nav {
+  transition:
+    width 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+    max-width 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+    min-height 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+    padding 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-radius 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  will-change: width, min-height, padding, border-radius, transform;
+}
+
+.site-header .brand-logo {
+  transform-origin: left center;
+  transition:
+    height 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  will-change: height, transform;
+}
+
+/* TOPO: grudado no topo + logo bem grande */
+.site-header.site-header-docked,
+.site-header[data-state="docked"],
+.site-shell.is-at-top .site-header {
+  padding: 0 0.75rem 0.35rem !important;
+}
+
+.site-header.site-header-docked .site-nav,
+.site-header[data-state="docked"] .site-nav,
+.site-shell.is-at-top .site-header .site-nav {
+  width: min(100%, 100%) !important;
+  max-width: none !important;
+  min-height: 7.7rem !important;
+  padding: 1rem clamp(1.15rem, 3vw, 2.2rem) !important;
+
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 2.25rem !important;
+  border-bottom-right-radius: 2.25rem !important;
+
+  border-top-color: transparent !important;
+  background-color: rgba(246, 234, 214, 0.94) !important;
+  box-shadow:
+    0 22px 38px rgba(52, 31, 21, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.56) !important;
+  transform: translateY(0) !important;
+}
+
+.site-header.site-header-docked .brand-logo,
+.site-header[data-state="docked"] .brand-logo,
+.site-shell.is-at-top .site-header .brand-logo {
+  height: clamp(6rem, 9vw, 8rem) !important;
+  transform: translateY(0.1rem) scale(1) !important;
+  filter:
+    contrast(1.8)
+    saturate(1.25)
+    drop-shadow(0 3px 3px rgba(52, 31, 21, 0.34))
+    drop-shadow(0 14px 18px rgba(52, 31, 21, 0.2)) !important;
+}
+
+/* SCROLL: descolado + logo atual */
+.site-header.site-header-floating,
+.site-header[data-state="floating"],
+.site-shell.is-scrolled .site-header {
+  padding: 0.85rem 1rem 0.35rem !important;
+}
+
+.site-header.site-header-floating .site-nav,
+.site-header[data-state="floating"] .site-nav,
+.site-shell.is-scrolled .site-header .site-nav {
+  width: min(1180px, calc(100% - 1rem)) !important;
+  max-width: calc(100% - 1rem) !important;
+  min-height: unset !important;
+  padding: 0.72rem 0.85rem !important;
+
+  border-radius: 999px !important;
+  border-top-color: rgba(52, 31, 21, 0.16) !important;
+  background-color: rgba(246, 234, 214, 0.78) !important;
+  box-shadow:
+    0 12px 28px rgba(52, 31, 21, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.48) !important;
+  transform: translateY(0) !important;
+}
+
+.site-header.site-header-floating .brand-logo,
+.site-header[data-state="floating"] .brand-logo,
+.site-shell.is-scrolled .site-header .brand-logo {
+  height: 3.4rem !important;
+  transform: none !important;
+}
+
+/* Deixa os links respirarem quando a logo está grande */
+.site-header.site-header-docked .site-nav-links,
+.site-header[data-state="docked"] .site-nav-links,
+.site-shell.is-at-top .site-header .site-nav-links {
+  transform: translateY(0.15rem);
+}
+
+.site-header.site-header-floating .site-nav-links,
+.site-header[data-state="floating"] .site-nav-links,
+.site-shell.is-scrolled .site-header .site-nav-links {
+  transform: none;
+}
+
+/* Responsivo */
+@media (max-width: 980px) {
+.site-header.site-header-docked .site-nav,
+  .site-header[data-state="docked"] .site-nav,
+  .site-shell.is-at-top .site-header .site-nav {
+    min-height: auto !important;
+    border-bottom-left-radius: 1.8rem !important;
+    border-bottom-right-radius: 1.8rem !important;
+  }
+
+  .site-header.site-header-docked .brand-logo,
+  .site-header[data-state="docked"] .brand-logo,
+  .site-shell.is-at-top .site-header .brand-logo {
+    height: clamp(4.4rem, 10vw, 5.8rem) !important;
+  }
+
+  .site-header.site-header-floating .brand-logo,
+  .site-header[data-state="floating"] .brand-logo,
+  .site-shell.is-scrolled .site-header .brand-logo {
+    height: 3rem !important;
+  }
+}
+
+@media (max-width: 560px) {
+.site-header.site-header-docked,
+  .site-header[data-state="docked"],
+  .site-shell.is-at-top .site-header {
+    padding-inline: 0.5rem !important;
+  }
+
+  .site-header.site-header-docked .site-nav,
+  .site-header[data-state="docked"] .site-nav,
+  .site-shell.is-at-top .site-header .site-nav {
+    padding: 0.85rem !important;
+    border-bottom-left-radius: 1.4rem !important;
+    border-bottom-right-radius: 1.4rem !important;
+  }
+
+  .site-header.site-header-docked .brand-logo,
+  .site-header[data-state="docked"] .brand-logo,
+  .site-shell.is-at-top .site-header .brand-logo {
+    height: 4rem !important;
+  }
+
+  .site-header.site-header-floating .brand-logo,
+  .site-header[data-state="floating"] .brand-logo,
+  .site-shell.is-scrolled .site-header .brand-logo {
+    height: 2.45rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header,
+  .site-header .site-nav,
+  .site-header .brand-logo {
+    transition: none !important;
+  }
+}
+
+
+/* =========================
+   FINAL DOCKED HEADER EXTRA DETAILS
+   ========================= */
+
+/*
+  Ajustes extras para o estado docked:
+  - logo maior;
+  - mais respiro antes do primeiro bloco;
+  - detalhes visuais no fundo da navbar grande.
+*/
+
+.site-header .site-nav {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.site-header .site-nav > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Fundo com detalhes somente quando a navbar está docked/no topo. */
+.site-header.site-header-docked .site-nav::before,
+.site-header[data-state="docked"] .site-nav::before,
+.site-shell.is-at-top .site-header .site-nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 8% 52%, rgba(171, 50, 43, 0.18), transparent 18%),
+    radial-gradient(circle at 23% 18%, rgba(216, 154, 27, 0.18), transparent 16%),
+    radial-gradient(circle at 78% 26%, rgba(47, 152, 163, 0.16), transparent 18%),
+    radial-gradient(circle at 92% 76%, rgba(118, 132, 77, 0.16), transparent 17%),
+    linear-gradient(90deg, rgba(255, 250, 242, 0.28), transparent 34%, rgba(255, 250, 242, 0.22));
+  opacity: 0.95;
+}
+
+.site-header.site-header-docked .site-nav::after,
+.site-header[data-state="docked"] .site-nav::after,
+.site-shell.is-at-top .site-header .site-nav::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      112deg,
+      transparent 0 22px,
+      rgba(52, 31, 21, 0.035) 22px 24px,
+      transparent 24px 46px
+    ),
+    url("/textures/paper-fiber.jpg");
+  background-size:
+    100% 100%,
+    560px 560px;
+  background-blend-mode:
+    normal,
+    multiply;
+  opacity: 0.42;
+  transform: rotate(-1deg);
+}
+
+/* Estado docked mais preenchido e logo maior. */
+.site-header.site-header-docked .site-nav,
+.site-header[data-state="docked"] .site-nav,
+.site-shell.is-at-top .site-header .site-nav {
+  min-height: 8.7rem !important;
+  padding: 1.1rem clamp(1.2rem, 3vw, 2.35rem) !important;
+}
+
+.site-header.site-header-docked .brand-logo,
+.site-header[data-state="docked"] .brand-logo,
+.site-shell.is-at-top .site-header .brand-logo {
+  height: clamp(7rem, 10vw, 9.2rem) !important;
+  transform: translateY(0.2rem) scale(1.02) !important;
+}
+
+/* Dá mais espaço entre o header grande e o primeiro bloco. */
+/* Quando estiver docked, links e botão sobem levemente para equilibrar com a logo maior. */
+.site-header.site-header-docked .site-nav-links,
+.site-header[data-state="docked"] .site-nav-links,
+.site-shell.is-at-top .site-header .site-nav-links {
+  transform: translateY(-0.05rem);
+}
+
+.site-header.site-header-docked .nav-button,
+.site-header[data-state="docked"] .nav-button,
+.site-shell.is-at-top .site-header .nav-button {
+  transform: translateY(-0.04rem);
+}
+
+/* Responsivo */
+@media (max-width: 980px) {
+.site-header.site-header-docked .site-nav,
+  .site-header[data-state="docked"] .site-nav,
+  .site-shell.is-at-top .site-header .site-nav {
+    min-height: auto !important;
+    padding: 0.95rem 1rem !important;
+  }
+
+  .site-header.site-header-docked .brand-logo,
+  .site-header[data-state="docked"] .brand-logo,
+  .site-shell.is-at-top .site-header .brand-logo {
+    height: clamp(4.9rem, 11vw, 6.4rem) !important;
+  }
+
+}
+
+@media (max-width: 560px) {
+.site-header.site-header-docked .brand-logo,
+  .site-header[data-state="docked"] .brand-logo,
+  .site-shell.is-at-top .site-header .brand-logo {
+    height: 4.45rem !important;
+  }
+
+}
+
+
+/* =========================
+   FINAL DOCKED NAV LINKS AS BUTTONS
+   ========================= */
+
+/*
+  Quando o header estiver docked, os links do menu viram botões coloridos
+  no mesmo clima dos botões do hero.
+*/
+
+.site-header.site-header-docked .site-nav-links,
+.site-header[data-state="docked"] .site-nav-links,
+.site-shell.is-at-top .site-header .site-nav-links {
+  gap: 0.65rem;
+}
+
+.site-header.site-header-docked .nav-link,
+.site-header[data-state="docked"] .nav-link,
+.site-shell.is-at-top .site-header .nav-link {
+  --dock-link-bg: var(--paper-light);
+  --dock-link-color: var(--ink);
+  --dock-link-border: rgba(52, 31, 21, 0.13);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0.78rem 1rem;
+  border: 1px solid var(--dock-link-border);
+  border-radius: 999px;
+  background-color: var(--dock-link-bg);
+  background-image: url("/textures/paper-fiber.jpg");
+  background-size: 420px 420px;
+  background-blend-mode: multiply;
+  color: var(--dock-link-color);
+  font-size: 0.72rem;
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow:
+    0 10px 16px rgba(52, 31, 21, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.36);
+  transform:
+    translate(
+      var(--dock-link-x, 0px),
+      calc(var(--dock-link-y, 0px) + var(--dock-link-hover-y, 0px))
+    )
+    rotate(var(--dock-link-rotate, 0deg));
+  transform-origin: center;
+  animation: dockedNavButtonJump 8.2s steps(1, end) infinite;
+  transition:
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+/* Remove underline antigo dos nav links quando estão em formato botão. */
+.site-header.site-header-docked .nav-link::after,
+.site-header[data-state="docked"] .nav-link::after,
+.site-shell.is-at-top .site-header .nav-link::after {
+  display: none;
+}
+
+/* Cores variadas dos botões docked */
+.site-header.site-header-docked .nav-link:nth-child(1),
+.site-header[data-state="docked"] .nav-link:nth-child(1),
+.site-shell.is-at-top .site-header .nav-link:nth-child(1) {
+  --dock-link-bg: var(--red);
+  --dock-link-color: #fffaf4;
+  --dock-link-border: rgba(143, 40, 31, 0.24);
+  --dock-link-rotate: -0.8deg;
+  animation-delay: 0s;
+}
+
+.site-header.site-header-docked .nav-link:nth-child(2),
+.site-header[data-state="docked"] .nav-link:nth-child(2),
+.site-shell.is-at-top .site-header .nav-link:nth-child(2) {
+  --dock-link-bg: var(--teal);
+  --dock-link-color: #fffaf4;
+  --dock-link-border: rgba(47, 152, 163, 0.26);
+  --dock-link-rotate: 0.7deg;
+  animation-delay: -0.75s;
+}
+
+.site-header.site-header-docked .nav-link:nth-child(3),
+.site-header[data-state="docked"] .nav-link:nth-child(3),
+.site-shell.is-at-top .site-header .nav-link:nth-child(3) {
+  --dock-link-bg: var(--mustard);
+  --dock-link-color: #fffaf4;
+  --dock-link-border: rgba(216, 154, 27, 0.28);
+  --dock-link-rotate: -0.45deg;
+  animation-delay: -1.5s;
+}
+
+.site-header.site-header-docked .nav-link:nth-child(4),
+.site-header[data-state="docked"] .nav-link:nth-child(4),
+.site-shell.is-at-top .site-header .nav-link:nth-child(4) {
+  --dock-link-bg: var(--sage);
+  --dock-link-color: #fffaf4;
+  --dock-link-border: rgba(118, 132, 77, 0.28);
+  --dock-link-rotate: 0.55deg;
+  animation-delay: -2.25s;
+}
+
+.site-header.site-header-docked .nav-link:hover,
+.site-header[data-state="docked"] .nav-link:hover,
+.site-shell.is-at-top .site-header .nav-link:hover {
+  --dock-link-hover-y: -3px;
+  color: var(--dock-link-color);
+  box-shadow:
+    0 15px 22px rgba(52, 31, 21, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+  filter: brightness(1.04) saturate(1.08);
+}
+
+/* Quando scrollar, os links voltam ao estilo original. */
+.site-header.site-header-floating .nav-link,
+.site-header[data-state="floating"] .nav-link,
+.site-shell.is-scrolled .site-header .nav-link {
+  display: inline-flex;
+  min-height: initial;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(52, 31, 21, 0.72);
+  box-shadow: none;
+  transform: none;
+  animation: none;
+}
+
+.site-header.site-header-floating .nav-link::after,
+.site-header[data-state="floating"] .nav-link::after,
+.site-shell.is-scrolled .site-header .nav-link::after {
+  display: block;
+}
+
+@keyframes dockedNavButtonJump {
+  0%,
+  100% {
+    --dock-link-x: 0px;
+    --dock-link-y: 0px;
+  }
+
+  18% {
+    --dock-link-x: 0.6px;
+    --dock-link-y: -1.2px;
+  }
+
+  32% {
+    --dock-link-x: -0.5px;
+    --dock-link-y: 0.5px;
+  }
+
+  50% {
+    --dock-link-x: 0.8px;
+    --dock-link-y: -0.7px;
+  }
+
+  68% {
+    --dock-link-x: -0.6px;
+    --dock-link-y: -0.8px;
+  }
+
+  84% {
+    --dock-link-x: 0.4px;
+    --dock-link-y: 0.4px;
+  }
+}
+
+@media (max-width: 980px) {
+  .site-header.site-header-docked .site-nav-links,
+  .site-header[data-state="docked"] .site-nav-links,
+  .site-shell.is-at-top .site-header .site-nav-links {
+    gap: 0.5rem;
+  }
+
+  .site-header.site-header-docked .nav-link,
+  .site-header[data-state="docked"] .nav-link,
+  .site-shell.is-at-top .site-header .nav-link {
+    min-height: 38px;
+    padding: 0.64rem 0.78rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+  }
+}
+
+@media (max-width: 560px) {
+  .site-header.site-header-docked .site-nav-links,
+  .site-header[data-state="docked"] .site-nav-links,
+  .site-shell.is-at-top .site-header .site-nav-links {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-header.site-header-docked .nav-link,
+  .site-header[data-state="docked"] .nav-link,
+  .site-shell.is-at-top .site-header .nav-link {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header.site-header-docked .nav-link,
+  .site-header[data-state="docked"] .nav-link,
+  .site-shell.is-at-top .site-header .nav-link {
+    animation: none !important;
+    transform: rotate(var(--dock-link-rotate, 0deg)) !important;
+  }
+}
+
+/* =========================
+   FINAL FOOTER BOOTS — CENTERED WALK IN PLACE
+   ========================= */
+
+/*
+  Footer centralizado + botas caminhando no mesmo lugar.
+  Ajustes desta versão:
+  - restaura a centralização do texto e da animação;
+  - mantém tudo dentro do mesmo card/borda do footer;
+  - inverte a direção visual da caminhada;
+  - não alterna z-index entre as botas.
+*/
+
+.footer-shell {
+  padding-bottom: 2.4rem !important;
+}
+
+.footer-card.footer-card-expanded,
+.footer-card-expanded {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  justify-items: center !important;
+  align-items: center !important;
+  gap: 1.05rem !important;
+  text-align: center !important;
+  padding: 1.25rem 1.35rem 1.05rem !important;
+}
+
+.footer-copy {
+  width: 100% !important;
+  max-width: 62rem !important;
+  margin-inline: auto !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  justify-items: center !important;
+  align-items: center !important;
+  gap: 0.38rem !important;
+  text-align: center !important;
+}
+
+.footer-copy p {
+  width: 100% !important;
+  margin: 0 !important;
+  text-align: center !important;
+}
+
+.footer-boot-stage {
+  position: relative !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  min-height: 11rem !important;
+  display: grid !important;
+  place-items: end center !important;
+  padding: 0.25rem 0 0.55rem !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.footer-boot-stage::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: 0.95rem !important;
+  width: min(22rem, 78%) !important;
+  height: 2px !important;
+  transform: translateX(-50%) !important;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(52, 31, 21, 0.12) 13%,
+      rgba(52, 31, 21, 0.26) 50%,
+      rgba(52, 31, 21, 0.12) 87%,
+      transparent 100%
+    ) !important;
+  opacity: 0.58 !important;
+}
+
+.footer-boot-stage::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: 0.75rem !important;
+  width: min(20rem, calc(100% - 3rem)) !important;
+  height: 2.8rem !important;
+  border-radius: 999px !important;
+  transform: translateX(-50%) !important;
+  background:
+    radial-gradient(circle at 28% 50%, rgba(171, 50, 43, 0.08), transparent 28%),
+    radial-gradient(circle at 72% 50%, rgba(216, 154, 27, 0.08), transparent 28%) !important;
+  filter: blur(12px) !important;
+  opacity: 0.9 !important;
+  pointer-events: none !important;
+}
+
+.footer-boot-track {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 0.62rem !important;
+  width: min(17.5rem, 92%) !important;
+  height: 8.6rem !important;
+  transform: translateX(-50%) !important;
+  overflow: visible !important;
+  pointer-events: none !important;
+}
+
+.footer-boot {
+  position: absolute !important;
+  bottom: 0.1rem !important;
+  width: clamp(4.9rem, 7.6vw, 6.1rem) !important;
+  height: auto !important;
+  object-fit: contain !important;
+  transform-origin: 52% 88% !important;
+  filter:
+    contrast(1.05)
+    saturate(1.06)
+    drop-shadow(0 8px 12px rgba(52, 31, 21, 0.18))
+    drop-shadow(0 2px 3px rgba(52, 31, 21, 0.1)) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+  z-index: 2 !important;
+}
+
+.footer-boot-left {
+  left: calc(50% - 5.25rem) !important;
+  animation: footerBootWalkLeft 1.36s linear infinite reverse !important;
+}
+
+.footer-boot-right {
+  left: calc(50% - 0.15rem) !important;
+  animation: footerBootWalkRight 1.36s linear infinite reverse !important;
+}
+
+@keyframes footerBootWalkLeft {
+  0% {
+    transform: translate3d(-0.38rem, 0, 0) rotate(-2deg);
+  }
+
+  10% {
+    transform: translate3d(-0.24rem, 0.02rem, 0) rotate(-1deg);
+  }
+
+  20% {
+    transform: translate3d(-0.05rem, 0, 0) rotate(0deg);
+  }
+
+  32% {
+    transform: translate3d(0.2rem, 0, 0) rotate(1deg);
+  }
+
+  42% {
+    transform: translate3d(0.42rem, 0.01rem, 0) rotate(1deg);
+  }
+
+  50% {
+    transform: translate3d(0.58rem, 0, 0) rotate(0deg);
+  }
+
+  58% {
+    transform: translate3d(0.42rem, -0.2rem, 0) rotate(4deg);
+  }
+
+  68% {
+    transform: translate3d(0.12rem, -0.46rem, 0) rotate(7deg);
+  }
+
+  78% {
+    transform: translate3d(-0.28rem, -0.36rem, 0) rotate(5deg);
+  }
+
+  88% {
+    transform: translate3d(-0.5rem, -0.12rem, 0) rotate(1deg);
+  }
+
+  100% {
+    transform: translate3d(-0.38rem, 0, 0) rotate(-2deg);
+  }
+}
+
+@keyframes footerBootWalkRight {
+  0% {
+    transform: translate3d(0.58rem, 0, 0) rotate(0deg);
+  }
+
+  8% {
+    transform: translate3d(0.42rem, -0.2rem, 0) rotate(4deg);
+  }
+
+  18% {
+    transform: translate3d(0.12rem, -0.46rem, 0) rotate(7deg);
+  }
+
+  28% {
+    transform: translate3d(-0.28rem, -0.36rem, 0) rotate(5deg);
+  }
+
+  38% {
+    transform: translate3d(-0.5rem, -0.12rem, 0) rotate(1deg);
+  }
+
+  50% {
+    transform: translate3d(-0.38rem, 0, 0) rotate(-2deg);
+  }
+
+  60% {
+    transform: translate3d(-0.24rem, 0.02rem, 0) rotate(-1deg);
+  }
+
+  70% {
+    transform: translate3d(-0.05rem, 0, 0) rotate(0deg);
+  }
+
+  82% {
+    transform: translate3d(0.2rem, 0, 0) rotate(1deg);
+  }
+
+  92% {
+    transform: translate3d(0.42rem, 0.01rem, 0) rotate(1deg);
+  }
+
+  100% {
+    transform: translate3d(0.58rem, 0, 0) rotate(0deg);
+  }
+}
+
+@media (max-width: 720px) {
+  .footer-card.footer-card-expanded,
+  .footer-card-expanded {
+    gap: 1rem !important;
+    padding: 1.15rem 1rem 0.9rem !important;
+  }
+
+  .footer-copy {
+    align-items: center !important;
+    justify-items: center !important;
+    text-align: center !important;
+  }
+
+  .footer-boot-stage {
+    min-height: 8.7rem !important;
+    padding: 0.2rem 0 0.45rem !important;
+    border-radius: 0 !important;
+  }
+
+  .footer-boot-track {
+    width: min(14rem, 92%) !important;
+    height: 6.8rem !important;
+    bottom: 0.74rem !important;
+  }
+
+  .footer-boot {
+    width: 4.45rem !important;
+  }
+
+  .footer-boot-left {
+    left: calc(50% - 4rem) !important;
+  }
+
+  .footer-boot-right {
+    left: calc(50% - 0.05rem) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-boot-left,
+  .footer-boot-right {
+    animation: none !important;
+  }
+
+  .footer-boot-left {
+    transform: translate3d(0.1rem, 0, 0) rotate(-2deg) !important;
+  }
+
+  .footer-boot-right {
+    transform: translate3d(0.45rem, 0, 0) rotate(0deg) !important;
+  }
+}
+
+/* =========================
+   MOBILE FIX REAL
+   - Cores fortes nos botões/chips
+   - Reveal mais leve
+   ========================= */
+
+@media (max-width: 720px) {
+  /*
+    MOBILE: botões/chips coloridos SEM textura.
+    A textura estava deixando tudo esbranquiçado.
+  */
+
+  .nav-button,
+  .action-button-primary,
+  .action-button-teal,
+  .info-chip.chip-red,
+  .info-chip.chip-teal,
+  .info-chip.chip-mustard,
+  .info-chip.chip-sage,
+  .info-chip.chip-terra,
+  .info-chip.chip-brown,
+  .separator-badge,
+  .places-title-icon,
+  .collage-icon-inner.icon-red,
+  .collage-icon-inner.icon-teal,
+  .collage-icon-inner.icon-mustard,
+  .collage-icon-inner.icon-sage,
+  .collage-icon-inner.icon-terra {
+    background-image: none !important;
+    background-blend-mode: normal !important;
+    color: #fffaf4 !important;
+    filter: none !important;
+    text-shadow: 0 1px 2px rgba(52, 31, 21, 0.32) !important;
+    box-shadow:
+      0 10px 16px rgba(52, 31, 21, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -10px 18px rgba(52, 31, 21, 0.08) !important;
+  }
+
+  .nav-button,
+  .action-button-primary,
+  .info-chip.chip-red,
+  .separator-badge,
+  .collage-icon-inner.icon-red {
+    background-color: #ab322b !important;
+    border-color: rgba(143, 40, 31, 0.38) !important;
+  }
+
+  .action-button-teal,
+  .info-chip.chip-teal,
+  .places-title-icon,
+  .collage-icon-inner.icon-teal {
+    background-color: #2f98a3 !important;
+    border-color: rgba(47, 152, 163, 0.38) !important;
+  }
+
+  .info-chip.chip-mustard,
+  .collage-icon-inner.icon-mustard {
+    background-color: #d89a1b !important;
+    border-color: rgba(152, 96, 59, 0.32) !important;
+  }
+
+  .info-chip.chip-sage,
+  .collage-icon-inner.icon-sage {
+    background-color: #76844d !important;
+    border-color: rgba(52, 31, 21, 0.2) !important;
+  }
+
+  .info-chip.chip-terra,
+  .collage-icon-inner.icon-terra {
+    background-color: #c37a45 !important;
+    border-color: rgba(52, 31, 21, 0.2) !important;
+  }
+
+  .info-chip.chip-brown {
+    background-color: #98603b !important;
+    border-color: rgba(52, 31, 21, 0.22) !important;
+  }
+
+  /*
+    Botões claros ainda podem usar textura.
+    Aqui ela não prejudica tanto porque o fundo é claro mesmo.
+  */
+
+  .action-button-ghost,
+  .action-button:not(.action-button-primary):not(.action-button-teal),
+  .place-details-button,
+  .meta-pill,
+  .mini-pill,
+  .soft-info-box {
+    background-color: var(--paper-light) !important;
+    background-image: url("/textures/paper-fiber.jpg") !important;
+    background-size: 440px 440px !important;
+    background-blend-mode: multiply !important;
+  }
+
+  /*
+    Reveal mais leve no mobile.
+  */
+
+  .reveal {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) !important;
+    transition:
+      opacity 0.32s ease-out,
+      transform 0.32s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    transition-delay: 0s !important;
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+  }
+
+  .reveal.visible,
+  .visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) !important;
+    will-change: auto;
+  }
+
+  /*
+    O fundo animado enorme pode pesar no mobile.
+    Mantemos o visual, mas sem animar o conic-gradient.
+  */
+
+  .site-shell::before {
+    animation: none !important;
+    filter: saturate(0.85) contrast(0.96) !important;
+  }
+}
+
+/* =========================
+   FINAL MOBILE COLOR FORCE
+   ========================= */
+
+@media (max-width: 720px) {
+  .nav-button,
+  .action-button-primary,
+  .action-button-teal,
+  .info-chip.chip-red,
+  .info-chip.chip-teal,
+  .info-chip.chip-mustard,
+  .info-chip.chip-sage,
+  .info-chip.chip-terra,
+  .info-chip.chip-brown,
+  .separator-badge,
+  .places-title-icon,
+  .collage-icon-inner.icon-red,
+  .collage-icon-inner.icon-teal,
+  .collage-icon-inner.icon-mustard,
+  .collage-icon-inner.icon-sage,
+  .collage-icon-inner.icon-terra {
+    position: relative !important;
+    isolation: isolate !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    background-blend-mode: normal !important;
+    color: #fffaf4 !important;
+    text-shadow: 0 1px 2px rgba(52, 31, 21, 0.35) !important;
+  }
+
+  .nav-button::before,
+  .action-button-primary::before,
+  .action-button-teal::before,
+  .info-chip.chip-red::before,
+  .info-chip.chip-teal::before,
+  .info-chip.chip-mustard::before,
+  .info-chip.chip-sage::before,
+  .info-chip.chip-terra::before,
+  .info-chip.chip-brown::before,
+  .separator-badge::before,
+  .places-title-icon::before,
+  .collage-icon-inner.icon-red::before,
+  .collage-icon-inner.icon-teal::before,
+  .collage-icon-inner.icon-mustard::before,
+  .collage-icon-inner.icon-sage::before,
+  .collage-icon-inner.icon-terra::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: -1 !important;
+    border-radius: inherit !important;
+    background: var(--mobile-solid-color, #ab322b) !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+  }
+
+  .nav-button,
+  .action-button-primary,
+  .info-chip.chip-red,
+  .separator-badge,
+  .collage-icon-inner.icon-red {
+    --mobile-solid-color: #ab322b;
+  }
+
+  .action-button-teal,
+  .info-chip.chip-teal,
+  .places-title-icon,
+  .collage-icon-inner.icon-teal {
+    --mobile-solid-color: #2f98a3;
+  }
+
+  .info-chip.chip-mustard,
+  .collage-icon-inner.icon-mustard {
+    --mobile-solid-color: #d89a1b;
+  }
+
+  .info-chip.chip-sage,
+  .collage-icon-inner.icon-sage {
+    --mobile-solid-color: #76844d;
+  }
+
+  .info-chip.chip-terra,
+  .collage-icon-inner.icon-terra {
+    --mobile-solid-color: #c37a45;
+  }
+
+  .info-chip.chip-brown {
+    --mobile-solid-color: #98603b;
+  }
+
+  .nav-button > *,
+  .action-button-primary > *,
+  .action-button-teal > *,
+  .info-chip > *,
+  .separator-badge > *,
+  .places-title-icon > *,
+  .collage-icon-inner > * {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+}
+
+/* =========================
+   FINAL MOBILE NAVBAR — ICON ONLY
+   ========================= */
+
+.nav-link-icon,
+.nav-button-icon {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .site-header {
+    padding: 0.48rem 0.55rem 0 !important;
+  }
+
+  .site-nav {
+    width: min(100% - 0.65rem, 100%) !important;
+    min-height: 3.25rem !important;
+
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    justify-items: stretch !important;
+    gap: 0.38rem !important;
+
+    padding: 0.45rem 0.55rem !important;
+    border-radius: 999px !important;
+    border-color: rgba(52, 31, 21, 0.22) !important;
+
+    position: relative !important;
+    isolation: isolate !important;
+    overflow: hidden !important;
+
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    background-blend-mode: normal !important;
+
+    box-shadow:
+      0 10px 22px rgba(52, 31, 21, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.32),
+      inset 0 -8px 14px rgba(52, 31, 21, 0.05) !important;
+
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .site-nav::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    border-radius: inherit !important;
+    background:
+      linear-gradient(135deg, rgba(255, 250, 242, 0.16), transparent 42%),
+      #e1c494 !important;
+    pointer-events: none !important;
+  }
+
+  .site-nav > * {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .brand-lockup {
+    min-width: 0 !important;
+    max-width: 5.75rem !important;
+    padding: 0 !important;
+    justify-content: flex-start !important;
+  }
+
+  .brand-logo {
+    display: block !important;
+    width: auto !important;
+    max-width: 5.75rem !important;
+    height: 2rem !important;
+    object-fit: contain !important;
+  }
+
+  .site-nav-links {
+    grid-column: auto !important;
+    order: initial !important;
+    width: auto !important;
+    min-width: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+    gap: 0.28rem !important;
+
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .nav-link,
+  .nav-button {
+    position: relative !important;
+    flex: 0 0 auto !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    border-radius: 999px !important;
+    line-height: 0 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+
+    overflow: hidden !important;
+    white-space: nowrap !important;
+
+    /* Esconde qualquer texto solto que tenha ficado dentro do link. */
+    font-size: 0 !important;
+  }
+
+  .nav-link {
+    width: 2.05rem !important;
+    height: 2.05rem !important;
+
+    border: 1px solid rgba(52, 31, 21, 0.16) !important;
+    background: rgba(255, 250, 242, 0.34) !important;
+    background-image: none !important;
+    color: rgba(52, 31, 21, 0.94) !important;
+
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 4px 8px rgba(52, 31, 21, 0.06) !important;
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    transform: none !important;
+    color: var(--ink) !important;
+    background: rgba(255, 250, 242, 0.48) !important;
+  }
+
+  .nav-link::before,
+  .nav-link::after,
+  .nav-button::before,
+  .nav-button::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  .nav-link-icon,
+  .nav-button-icon,
+  .nav-link > svg,
+  .nav-button > svg {
+    display: block !important;
+    width: 1rem !important;
+    height: 1rem !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+
+  .nav-link-label,
+  .nav-button-label {
+    display: none !important;
+  }
+
+  .nav-button {
+    width: 2.12rem !important;
+    height: 2.12rem !important;
+    min-width: 2.12rem !important;
+    min-height: 0 !important;
+
+    border: 1px solid rgba(143, 40, 31, 0.34) !important;
+    background-color: #ab322b !important;
+    background-image: none !important;
+    background-blend-mode: normal !important;
+    color: #fffaf4 !important;
+
+    box-shadow:
+      0 7px 12px rgba(52, 31, 21, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -8px 14px rgba(52, 31, 21, 0.1) !important;
+  }
+
+  .nav-button:hover,
+  .nav-button:focus-visible {
+    transform: none !important;
+    filter: none !important;
+  }
+
+}
+
+@media (max-width: 420px) {
+  .site-header {
+    padding: 0.42rem 0.38rem 0 !important;
+  }
+
+  .site-nav {
+    width: 100% !important;
+    min-height: 3rem !important;
+    gap: 0.24rem !important;
+    padding: 0.38rem 0.42rem !important;
+  }
+
+  .brand-lockup {
+    max-width: 4.95rem !important;
+  }
+
+  .brand-logo {
+    max-width: 4.95rem !important;
+    height: 1.75rem !important;
+  }
+
+  .site-nav-links {
+    gap: 0.2rem !important;
+  }
+
+  .nav-link {
+    width: 1.9rem !important;
+    height: 1.9rem !important;
+  }
+
+  .nav-button {
+    width: 1.98rem !important;
+    height: 1.98rem !important;
+    min-width: 1.98rem !important;
+  }
+
+  .nav-link-icon,
+  .nav-button-icon,
+  .nav-link > svg,
+  .nav-button > svg {
+    width: 0.92rem !important;
+    height: 0.92rem !important;
+  }
+
+}
+
+/* =========================
+   FINAL NAVBAR SPACING CONTROL — ÚNICO LUGAR
+   Ajuste o espaço entre a navbar fixa e o primeiro bloco somente aqui.
+   ========================= */
+
+.site-shell {
+  --navbar-page-offset: 16rem;
+  --navbar-page-offset-correction: 0px;
+
+  padding-top: calc(
+    var(--navbar-page-offset) + var(--navbar-page-offset-correction)
+  ) !important;
+}
+
+@media (max-width: 980px) {
+  .site-shell {
+    --navbar-page-offset: 6.25rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .site-shell {
+    --navbar-page-offset: 5.35rem;
+  }
+
+  .site-shell.is-at-top .hero-section,
+  .site-shell.is-scrolled .hero-section,
+  .site-header-docked ~ .hero-section,
+  .site-header-floating ~ .hero-section {
+    padding-top: 0 !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .site-shell {
+    --navbar-page-offset: 8.5rem;
+  }
 }
